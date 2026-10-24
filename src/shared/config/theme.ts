@@ -76,13 +76,17 @@ export const theme = createTheme({
   },
 
   components: {
-    Button: { defaultProps: { color: 'dark.0' } },
+    Button: { defaultProps: { color: 'brand', size: 'md' } },
     Input: { defaultProps: { variant: 'filled' } },
+    TextInput: { defaultProps: { size: 'md' } },
+    PasswordInput: { defaultProps: { size: 'md' } },
+    Select: { defaultProps: { size: 'md' } },
+    DatePickerInput: { defaultProps: { size: 'md' } },
     InputWrapper: {
       styles: {
         label: {
           fontSize: 'var(--mantine-font-size-sm)',
-          fontWeight: 500,
+          fontWeight: 400,
           lineHeight: 1.3,
           marginBottom: 'calc(var(--mantine-spacing-xs) / 2)',
         },
@@ -96,6 +100,26 @@ export const theme = createTheme({
           paddingBlock: 'var(--mantine-spacing-sm)',
         },
         label: { fontSize: 'var(--mantine-font-size-md)' },
+      },
+    },
+    Modal: {
+      defaultProps: {
+        radius: 'xl',
+        padding: 'lg',
+        centered: true,
+        overlayProps: { backgroundOpacity: 0.75 },
+      },
+      styles: {
+        content: { backgroundColor: 'var(--color-surface-2)' },
+        header: {
+          backgroundColor: 'var(--color-surface-2)',
+          paddingBottom: 'var(--mantine-spacing-xs)',
+        },
+        title: {
+          fontFamily: 'var(--mantine-font-family-headings)',
+          fontSize: 'var(--mantine-font-size-lg)',
+          fontWeight: 700,
+        },
       },
     },
   },

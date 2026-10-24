@@ -1,9 +1,12 @@
 import '@fontsource-variable/exo-2'
 import '@fontsource-variable/inter/opsz.css'
 import '@mantine/core/styles.css'
+import '@mantine/dates/styles.css'
+import 'dayjs/locale/ru'
 import '@/app/styles/index.css'
 
 import { MantineProvider } from '@mantine/core'
+import { DatesProvider } from '@mantine/dates'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { Provider } from 'react-redux'
@@ -38,10 +41,12 @@ createRoot(rootElement).render(
       cssVariablesResolver={cssVariablesResolver}
       forceColorScheme='dark'
     >
-      <Provider store={store}>
-        <RouterProvider router={router} />
-        <Toaster position='bottom-center' theme='dark' />
-      </Provider>
+      <DatesProvider settings={{ locale: 'ru', firstDayOfWeek: 1 }}>
+        <Provider store={store}>
+          <RouterProvider router={router} />
+          <Toaster position='bottom-center' theme='dark' />
+        </Provider>
+      </DatesProvider>
     </MantineProvider>
   </StrictMode>,
 )

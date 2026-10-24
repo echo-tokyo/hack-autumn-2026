@@ -4,6 +4,7 @@ import {
   OccurrenceRow,
   useGetPaymentOccurrencesQuery,
 } from '@/entities/payment-occurrence'
+import { MarkPaymentButton } from '@/features/mark-payment'
 import { todayIso } from '@/shared/lib'
 
 import {
@@ -59,7 +60,12 @@ export function OccurrenceGroups({ keys }: IOccurrenceGroupsProps) {
             <GroupMessage>{group.emptyText}</GroupMessage>
           ) : (
             group.items.map((item) => (
-              <OccurrenceRow key={item.id} occurrence={item} today={today} />
+              <OccurrenceRow
+                key={item.id}
+                occurrence={item}
+                today={today}
+                action={<MarkPaymentButton occurrence={item} />}
+              />
             ))
           )}
         </OccurrenceGroup>

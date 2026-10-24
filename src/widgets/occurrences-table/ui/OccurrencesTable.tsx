@@ -13,7 +13,7 @@ import { useOccurrencesTable } from '../model/use-occurrences-table'
 import { OccurrencesFilters } from './OccurrencesFilters'
 import { OccurrencesTableView } from './OccurrencesTableView'
 
-const SKELETON_HEIGHT = 240
+const SKELETON_HEIGHT = 300
 
 export function OccurrencesTable() {
   const {

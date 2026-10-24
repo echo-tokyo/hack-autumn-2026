@@ -4,9 +4,10 @@ import {
   getOccurrenceStatus,
   type IPaymentOccurrence,
 } from '@/entities/payment-occurrence'
+import { MarkPaymentButton } from '@/features/mark-payment'
 import { formatAmount, formatShortDate } from '@/shared/lib'
 
-const TABLE_MIN_WIDTH = 760
+const TABLE_MIN_WIDTH = 900
 const TABLE_MIN_HEIGHT = 200
 const FONT_WEIGHT = 400
 
@@ -35,6 +36,7 @@ export function OccurrencesTableView({
             <Table.Th fw={FONT_WEIGHT} ta='right'>
               Просрочка
             </Table.Th>
+            <Table.Th fw={FONT_WEIGHT}>Действие</Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
@@ -61,6 +63,9 @@ export function OccurrencesTableView({
                 </Table.Td>
                 <Table.Td ta='right'>
                   {status.overdueDays > 0 ? `${status.overdueDays} дн.` : '-'}
+                </Table.Td>
+                <Table.Td>
+                  <MarkPaymentButton occurrence={occurrence} />
                 </Table.Td>
               </Table.Tr>
             )

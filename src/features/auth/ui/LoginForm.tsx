@@ -31,7 +31,6 @@ export function LoginForm() {
             <TextInput
               label='Логин'
               placeholder='Введите логин'
-              size='lg'
               autoComplete='username'
               error={fieldState.error?.message}
               {...field}
@@ -45,7 +44,6 @@ export function LoginForm() {
             <PasswordInput
               label='Пароль'
               placeholder='Введите пароль'
-              size='lg'
               autoComplete='current-password'
               error={fieldState.error?.message}
               {...field}
@@ -54,7 +52,6 @@ export function LoginForm() {
         />
         <Button
           type='submit'
-          size='lg'
           fullWidth
           disabled={!isDirty}
           loading={isSubmitting}

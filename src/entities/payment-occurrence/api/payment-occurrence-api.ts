@@ -3,6 +3,7 @@ import { baseApi } from '@/shared/api'
 import type {
   IPaymentOccurrence,
   IPaymentOccurrencesFilter,
+  IUpdatePaymentOccurrence,
 } from '../model/types'
 
 export const paymentOccurrenceApi = baseApi.injectEndpoints({
@@ -17,7 +18,22 @@ export const paymentOccurrenceApi = baseApi.injectEndpoints({
       }),
       providesTags: ['PaymentOccurrence'],
     }),
+
+    updatePaymentOccurrence: build.mutation<
+      IPaymentOccurrence,
+      IUpdatePaymentOccurrence
+    >({
+      query: ({ id, ...body }) => ({
+        url: `/payment-occurrences/${id}`,
+        method: 'PATCH',
+        body,
+      }),
+      invalidatesTags: ['PaymentOccurrence', 'PaymentsSummary'],
+    }),
   }),
 })
 
-export const { useGetPaymentOccurrencesQuery } = paymentOccurrenceApi
+export const {
+  useGetPaymentOccurrencesQuery,
+  useUpdatePaymentOccurrenceMutation,
+} = paymentOccurrenceApi

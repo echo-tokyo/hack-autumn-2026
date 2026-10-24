@@ -17,3 +17,9 @@ export interface IPaymentOccurrencesFilter {
   status?: TOccurrenceStatusFilter
   currency?: TCurrency
 }
+
+export interface IUpdatePaymentOccurrence {
+  id: number
+  isPaid: boolean
+  paymentDate: string | null
+}

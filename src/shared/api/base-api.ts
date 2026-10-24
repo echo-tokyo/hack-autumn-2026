@@ -39,7 +39,11 @@ async function refreshSession(
   return !result.error
 }
 
-const baseQueryWithReauth: TBaseQuery = async (args, api, extraOptions) => {
+const baseQueryWithReauth: TBaseQuery = async (
+  args,
+  api,
+  extraOptions = {},
+) => {
   if (refreshPromise) {
     await refreshPromise
   }
