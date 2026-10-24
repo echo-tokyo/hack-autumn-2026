@@ -9,7 +9,6 @@ import { formatAmount, formatShortDate } from '@/shared/lib'
 
 const TABLE_MIN_WIDTH = 900
 const TABLE_MIN_HEIGHT = 200
-const FONT_WEIGHT = 400
 
 interface IOccurrencesTableViewProps {
   occurrences: IPaymentOccurrence[]
@@ -24,29 +23,19 @@ export function OccurrencesTableView({
     <Table.ScrollContainer minWidth={TABLE_MIN_WIDTH} mih={TABLE_MIN_HEIGHT}>
       <Table verticalSpacing='sm' layout='fixed'>
         <Table.Thead>
-          <Table.Tr c='dimmed'>
-            <Table.Th fw={FONT_WEIGHT}>Название</Table.Th>
-            <Table.Th fw={FONT_WEIGHT} ta='right' w={120}>
+          <Table.Tr>
+            <Table.Th>Название</Table.Th>
+            <Table.Th ta='right' w={120}>
               Сумма
             </Table.Th>
-            <Table.Th fw={FONT_WEIGHT} w={90}>
-              Валюта
-            </Table.Th>
-            <Table.Th fw={FONT_WEIGHT} w={120}>
-              Срок оплаты
-            </Table.Th>
-            <Table.Th fw={FONT_WEIGHT} w={150}>
-              Статус
-            </Table.Th>
-            <Table.Th fw={FONT_WEIGHT} w={130}>
-              Дата оплаты
-            </Table.Th>
-            <Table.Th fw={FONT_WEIGHT} ta='right' w={110}>
+            <Table.Th w={90}>Валюта</Table.Th>
+            <Table.Th w={120}>Срок оплаты</Table.Th>
+            <Table.Th w={150}>Статус</Table.Th>
+            <Table.Th w={130}>Дата оплаты</Table.Th>
+            <Table.Th ta='right' w={110}>
               Просрочка
             </Table.Th>
-            <Table.Th fw={FONT_WEIGHT} w={170}>
-              Действие
-            </Table.Th>
+            <Table.Th w={170}>Действие</Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
@@ -56,13 +45,13 @@ export function OccurrencesTableView({
             return (
               <Table.Tr key={occurrence.id}>
                 <Table.Td fw={600}>{occurrence.name}</Table.Td>
-                <Table.Td ta='right' fw={FONT_WEIGHT}>
+                <Table.Td ta='right'>
                   {formatAmount(occurrence.amount)}
                 </Table.Td>
                 <Table.Td>{occurrence.currency}</Table.Td>
                 <Table.Td>{formatShortDate(occurrence.dueDate)}</Table.Td>
                 <Table.Td>
-                  <Text span c={status.color} fw={FONT_WEIGHT} fz='sm'>
+                  <Text span c={status.color} fz='sm'>
                     {status.label}
                   </Text>
                 </Table.Td>

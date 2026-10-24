@@ -1,7 +1,7 @@
-import { Center, Paper, SimpleGrid, Stack, Text, Title } from '@mantine/core'
+import { Center, SimpleGrid, Stack, Text, Title } from '@mantine/core'
 
 import { LoginForm } from '@/features/auth'
-import { Logo } from '@/shared/ui'
+import { Logo, Panel } from '@/shared/ui'
 
 import styles from './styles.module.css'
 
@@ -18,12 +18,7 @@ export function LoginPage() {
         w='100%'
         maw={CARD_MAX_WIDTH}
       >
-        <Paper
-          bg='var(--color-surface-2)'
-          radius='xl'
-          p='xl'
-          mih={{ sm: PANEL_MIN_HEIGHT }}
-        >
+        <Panel radius='xl' p='xl' mih={{ sm: PANEL_MIN_HEIGHT }}>
           <Stack justify='space-between' h='100%' gap='xl'>
             <Stack gap='xs'>
               <Title order={1}>Вход в Invoice Keeper</Title>
@@ -33,21 +28,16 @@ export function LoginPage() {
             </Stack>
             <Logo />
           </Stack>
-        </Paper>
+        </Panel>
 
-        <Paper
-          bg='var(--color-surface-2)'
-          radius='xl'
-          p='xl'
-          mih={{ sm: PANEL_MIN_HEIGHT }}
-        >
+        <Panel radius='xl' p='xl' mih={{ sm: PANEL_MIN_HEIGHT }}>
           <Stack justify='space-between' h='100%' gap='xl'>
             <LoginForm />
             <Text c='dimmed' fz='sm'>
               Нет учётной записи? Её создаёт администратор
             </Text>
           </Stack>
-        </Paper>
+        </Panel>
       </SimpleGrid>
     </Center>
   )

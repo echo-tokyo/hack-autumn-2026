@@ -1,6 +1,8 @@
 import { NavLink, Stack, Text } from '@mantine/core'
 import { NavLink as RouterNavLink } from 'react-router'
 
+import { ICON_SIZE, ICON_STROKE } from '@/shared/config'
+
 import type { INavGroup } from '../config/nav-groups'
 import styles from './styles.module.css'
 
@@ -25,7 +27,7 @@ export function SidebarNav({ groups, onNavigate }: ISidebarNavProps) {
               to={to}
               end
               label={label}
-              rightSection={<Icon size={20} stroke={1.5} />}
+              rightSection={<Icon size={ICON_SIZE} stroke={ICON_STROKE} />}
               onClick={onNavigate}
             />
           ))}

@@ -1,4 +1,4 @@
-import { Button, Skeleton, Stack } from '@mantine/core'
+import { Button, Stack } from '@mantine/core'
 
 import {
   OccurrenceRow,
@@ -6,15 +6,13 @@ import {
 } from '@/entities/payment-occurrence'
 import { MarkPaymentButton } from '@/features/mark-payment'
 import { todayIso } from '@/shared/lib'
+import { SkeletonRows } from '@/shared/ui'
 
 import {
   groupOccurrences,
   type TOccurrenceGroupKey,
 } from '../model/group-occurrences'
 import { GroupMessage, OccurrenceGroup } from './OccurrenceGroup'
-
-const SKELETON_ROWS = 6
-const SKELETON_ROW_HEIGHT = 56
 
 interface IOccurrenceGroupsProps {
   keys: TOccurrenceGroupKey[]
@@ -27,9 +25,7 @@ export function OccurrenceGroups({ keys }: IOccurrenceGroupsProps) {
   if (isLoading) {
     return (
       <OccurrenceGroup title='Платежи'>
-        {Array.from({ length: SKELETON_ROWS }, (_, index) => (
-          <Skeleton key={index} h={SKELETON_ROW_HEIGHT} my='sm' />
-        ))}
+        <SkeletonRows rowHeight={56} />
       </OccurrenceGroup>
     )
   }

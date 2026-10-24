@@ -79,6 +79,7 @@ export const baseApi = createApi({
     'PaymentOccurrence',
     'PaymentsSummary',
     'RecurringPayment',
+    'User',
   ],
   endpoints: () => ({}),
 })

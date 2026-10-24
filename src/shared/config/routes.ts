@@ -3,4 +3,5 @@ export const ROUTES = {
   payments: '/',
   occurrences: '/occurrences',
   recurringPayments: '/recurring-payments',
+  users: '/users',
 } as const

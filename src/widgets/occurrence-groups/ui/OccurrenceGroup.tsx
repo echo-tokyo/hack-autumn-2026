@@ -1,5 +1,7 @@
-import { Paper, Stack, Text, Title } from '@mantine/core'
+import { Stack, Text, Title } from '@mantine/core'
 import type { ReactNode } from 'react'
+
+import { Panel } from '@/shared/ui'
 
 import styles from './styles.module.css'
 
@@ -20,9 +22,9 @@ export function OccurrenceGroup({
         {title}
         {count !== undefined && ` (${count})`}
       </Title>
-      <Paper bg='var(--color-surface-2)' radius='lg' px='lg' py='xs'>
+      <Panel px='lg' py='xs'>
         <div className={styles.list}>{children}</div>
-      </Paper>
+      </Panel>
     </Stack>
   )
 }

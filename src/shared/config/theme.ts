@@ -2,6 +2,7 @@ import {
   createTheme,
   type CSSVariablesResolver,
   type MantineColorsTuple,
+  type MantineTransition,
 } from '@mantine/core'
 
 const brand: MantineColorsTuple = [
@@ -31,6 +32,12 @@ const dark: MantineColorsTuple = [
 ]
 
 const OVERLAY_SHADOW = '0 8px 32px rgba(0, 0, 0, 0.6)'
+
+const MODAL_RISE: MantineTransition = {
+  in: { opacity: 1, transform: 'translateY(0)' },
+  out: { opacity: 0, transform: 'translateY(24px)' },
+  transitionProperty: 'opacity, transform',
+}
 
 export const theme = createTheme({
   colors: { brand, dark },
@@ -103,13 +110,21 @@ export const theme = createTheme({
         label: { fontSize: 'var(--mantine-font-size-md)' },
       },
     },
+    Table: {
+      styles: {
+        th: {
+          fontWeight: 400,
+          color: 'var(--mantine-color-dimmed)',
+        },
+      },
+    },
     Modal: {
       defaultProps: {
         radius: 'xl',
         padding: 'lg',
         centered: true,
         overlayProps: { backgroundOpacity: 0.75 },
-        transitionProps: { transition: 'slide-up', duration: 250 },
+        transitionProps: { transition: MODAL_RISE, duration: 200 },
       },
       styles: {
         content: { backgroundColor: 'var(--color-surface-2)' },
@@ -142,6 +157,5 @@ export const cssVariablesResolver: CSSVariablesResolver = () => ({
     '--color-accent': '#4cc6f1',
     '--color-success': '#2cc04d',
     '--color-danger': '#ff4d4d',
-    '--color-button-disabled': '#a3a3a3',
   },
 })

@@ -2,7 +2,6 @@ import {
   ActionIcon,
   Button,
   Group,
-  Paper,
   SimpleGrid,
   Skeleton,
   Stack,
@@ -16,6 +15,8 @@ import {
   CurrencyTotalsBars,
   useGetPaymentsSummaryQuery,
 } from '@/entities/payment-summary'
+import { ICON_SIZE } from '@/shared/config'
+import { Panel } from '@/shared/ui'
 
 const SKELETON_COUNT = 3
 const SKELETON_HEIGHT = 72
@@ -30,11 +31,11 @@ export function PaymentsSummary() {
         <Title order={2}>Итоги по валютам</Title>
         <Tooltip label={HINT} multiline w={240} withArrow>
           <ActionIcon variant='subtle' color='gray' aria-label={HINT}>
-            <IconInfoSquareRoundedFilled size={20} />
+            <IconInfoSquareRoundedFilled size={ICON_SIZE} />
           </ActionIcon>
         </Tooltip>
       </Group>
-      <Paper bg='var(--color-surface-2)' radius='lg' p='md'>
+      <Panel p='md'>
         {isLoading && (
           <SimpleGrid cols={{ base: 1, md: SKELETON_COUNT }} spacing='xl'>
             {Array.from({ length: SKELETON_COUNT }, (_, index) => (
@@ -53,7 +54,7 @@ export function PaymentsSummary() {
         )}
 
         {data && <CurrencyTotalsBars totals={data.totals} />}
-      </Paper>
+      </Panel>
     </Stack>
   )
 }

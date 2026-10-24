@@ -1,25 +1,20 @@
-import { Paper, Skeleton, Table, Text } from '@mantine/core'
+import { Table, Text } from '@mantine/core'
 
 import { PERIOD_LABELS } from '@/entities/recurring-payment'
 import { DeleteRecurringPaymentButton } from '@/features/delete-recurring-payment'
 import { formatAmount, formatShortDate } from '@/shared/lib'
+import { Panel, SkeletonRows } from '@/shared/ui'
 
 import { useRecurringPayments } from '../model/use-recurring-payments'
 
 const TABLE_MIN_WIDTH = 720
-const SKELETON_ROWS = 6
-const SKELETON_ROW_HEIGHT = 60
-const HEADER_WEIGHT = 400
 
 export function RecurringPaymentsTable() {
   const { payments, isLoading } = useRecurringPayments()
 
   return (
-    <Paper bg='var(--color-surface-2)' radius='lg' px='lg' py='sm'>
-      {isLoading &&
-        Array.from({ length: SKELETON_ROWS }, (_, index) => (
-          <Skeleton key={index} h={SKELETON_ROW_HEIGHT} my='sm' />
-        ))}
+    <Panel px='lg' py='sm'>
+      {isLoading && <SkeletonRows />}
 
       {!isLoading && payments.length === 0 && (
         <Text c='dimmed' py='sm'>
@@ -32,23 +27,15 @@ export function RecurringPaymentsTable() {
         <Table.ScrollContainer minWidth={TABLE_MIN_WIDTH}>
           <Table verticalSpacing='sm' layout='fixed'>
             <Table.Thead>
-              <Table.Tr c='dimmed'>
-                <Table.Th fw={HEADER_WEIGHT}>Название</Table.Th>
-                <Table.Th fw={HEADER_WEIGHT} ta='right' w={140}>
+              <Table.Tr>
+                <Table.Th>Название</Table.Th>
+                <Table.Th ta='right' w={140}>
                   Сумма
                 </Table.Th>
-                <Table.Th fw={HEADER_WEIGHT} w={100}>
-                  Валюта
-                </Table.Th>
-                <Table.Th fw={HEADER_WEIGHT} w={160}>
-                  Периодичность
-                </Table.Th>
-                <Table.Th fw={HEADER_WEIGHT} w={180}>
-                  Ближайшая оплата
-                </Table.Th>
-                <Table.Th fw={HEADER_WEIGHT} w={130}>
-                  Действие
-                </Table.Th>
+                <Table.Th w={100}>Валюта</Table.Th>
+                <Table.Th w={160}>Периодичность</Table.Th>
+                <Table.Th w={180}>Ближайшая оплата</Table.Th>
+                <Table.Th w={130}>Действие</Table.Th>
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
@@ -72,6 +59,6 @@ export function RecurringPaymentsTable() {
           </Table>
         </Table.ScrollContainer>
       )}
-    </Paper>
+    </Panel>
   )
 }

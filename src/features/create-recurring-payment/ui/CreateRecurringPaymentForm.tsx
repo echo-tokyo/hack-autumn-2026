@@ -34,7 +34,7 @@ export function CreateRecurringPaymentForm({
   const {
     control,
     handleSubmit,
-    formState: { isSubmitting },
+    formState: { isDirty, isSubmitting },
   } = useForm<TRecurringPaymentSchema>({
     resolver: zodResolver(recurringPaymentSchema),
     defaultValues: { name: '', currency: 'RUB', period: 'monthly' },
@@ -138,7 +138,12 @@ export function CreateRecurringPaymentForm({
           последний день. Если до срока меньше 3 дней, бот напомнит сразу.
         </Text>
 
-        <Button type='submit' fullWidth loading={isSubmitting}>
+        <Button
+          type='submit'
+          fullWidth
+          disabled={!isDirty}
+          loading={isSubmitting}
+        >
           Добавить платёж
         </Button>
       </Stack>

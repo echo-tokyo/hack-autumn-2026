@@ -1,20 +1,11 @@
-import {
-  Button,
-  LoadingOverlay,
-  Paper,
-  Skeleton,
-  Stack,
-  Text,
-} from '@mantine/core'
+import { Button, LoadingOverlay, Stack, Text } from '@mantine/core'
 
 import { todayIso } from '@/shared/lib'
+import { Panel, SkeletonRows } from '@/shared/ui'
 
 import { useOccurrencesTable } from '../model/use-occurrences-table'
 import { OccurrencesFilters } from './OccurrencesFilters'
 import { OccurrencesTableView } from './OccurrencesTableView'
-
-const SKELETON_ROWS = 6
-const SKELETON_ROW_HEIGHT = 36
 
 export function OccurrencesTable() {
   const {
@@ -31,23 +22,14 @@ export function OccurrencesTable() {
     <Stack gap='md'>
       <OccurrencesFilters filter={filter} onChange={setFilter} />
 
-      <Paper
-        pos='relative'
-        bg='var(--color-surface-2)'
-        radius='lg'
-        px='lg'
-        py='sm'
-      >
+      <Panel pos='relative' px='lg' py='sm'>
         <LoadingOverlay
           visible={isRefetching}
           overlayProps={{ radius: 'lg', backgroundOpacity: 0.5 }}
           loaderProps={{ size: 'sm' }}
         />
 
-        {isLoading &&
-          Array.from({ length: SKELETON_ROWS }, (_, index) => (
-            <Skeleton key={index} h={SKELETON_ROW_HEIGHT} my='sm' />
-          ))}
+        {isLoading && <SkeletonRows />}
 
         {!isLoading && occurrences.length === 0 && (
           <Stack gap='sm' align='flex-start' py='sm'>
@@ -67,7 +49,7 @@ export function OccurrencesTable() {
         {occurrences.length > 0 && (
           <OccurrencesTableView occurrences={occurrences} today={todayIso()} />
         )}
-      </Paper>
+      </Panel>
     </Stack>
   )
 }

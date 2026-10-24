@@ -18,6 +18,7 @@ export function MarkPaymentForm({ occurrence, onDone }: IMarkPaymentFormProps) {
     occurrence.paymentDate ?? today,
   )
   const { savePayment, cancelPayment, isLoading } = useMarkPayment(occurrence)
+  const isUnchanged = paymentDate === occurrence.paymentDate
 
   async function handleSave() {
     if (paymentDate && (await savePayment(paymentDate))) {
@@ -60,7 +61,7 @@ export function MarkPaymentForm({ occurrence, onDone }: IMarkPaymentFormProps) {
         )}
         <Button
           color='brand'
-          disabled={!paymentDate}
+          disabled={!paymentDate || isUnchanged}
           loading={isLoading}
           onClick={handleSave}
         >

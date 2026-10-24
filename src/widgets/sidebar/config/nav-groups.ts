@@ -3,6 +3,7 @@ import {
   IconCalendarFilled,
   IconListDetailsFilled,
   IconReceiptFilled,
+  IconUserFilled,
 } from '@tabler/icons-react'
 
 import { ROUTES } from '@/shared/config'
@@ -41,6 +42,7 @@ export const NAV_GROUPS: INavGroup[] = [
         to: ROUTES.recurringPayments,
         icon: IconReceiptFilled,
       },
+      { label: 'Пользователи', to: ROUTES.users, icon: IconUserFilled },
     ],
   },
 ]

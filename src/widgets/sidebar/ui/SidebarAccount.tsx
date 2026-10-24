@@ -1,6 +1,7 @@
-import { Paper, Text } from '@mantine/core'
+import { Text } from '@mantine/core'
 
 import { type IUser, USER_ROLE_LABELS } from '@/entities/user'
+import { Panel } from '@/shared/ui'
 
 interface ISidebarAccountProps {
   user: IUser
@@ -8,13 +9,13 @@ interface ISidebarAccountProps {
 
 export function SidebarAccount({ user }: ISidebarAccountProps) {
   return (
-    <Paper bg='var(--color-surface-2)' radius='lg' p='md'>
+    <Panel p='md'>
       <Text fw={700} fz='lg'>
         @{user.username}
       </Text>
       <Text c='dimmed' fz='sm'>
         {USER_ROLE_LABELS[user.role]}
       </Text>
-    </Paper>
+    </Panel>
   )
 }

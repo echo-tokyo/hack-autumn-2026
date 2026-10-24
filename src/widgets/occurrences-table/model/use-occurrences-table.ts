@@ -1,22 +1,17 @@
-import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
+import { useState } from 'react'
 
 import {
   type IPaymentOccurrencesFilter,
   useGetPaymentOccurrencesQuery,
 } from '@/entities/payment-occurrence'
-import { getErrorMessage } from '@/shared/api'
+import { useErrorToast } from '@/shared/api'
 
 export function useOccurrencesTable() {
   const [filter, setFilter] = useState<IPaymentOccurrencesFilter>({})
   const { data, error, isLoading, isFetching } =
     useGetPaymentOccurrencesQuery(filter)
 
-  useEffect(() => {
-    if (error) {
-      toast.error(getErrorMessage(error))
-    }
-  }, [error])
+  useErrorToast(error)
 
   const occurrences = error ? [] : (data ?? [])
   const isFiltered = Boolean(filter.status ?? filter.currency)

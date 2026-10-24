@@ -15,7 +15,7 @@ function isSerializedError(error: unknown): error is SerializedError {
   return isObject(error) && typeof error.message === 'string'
 }
 
-type TStatusMessages = Partial<Record<number, string>>
+export type TStatusMessages = Partial<Record<number, string>>
 
 export function getErrorMessage(
   error: unknown,

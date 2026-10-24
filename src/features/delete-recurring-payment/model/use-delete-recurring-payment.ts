@@ -1,10 +1,8 @@
-import { toast } from 'sonner'
-
 import {
   type IRecurringPayment,
   useDeleteRecurringPaymentMutation,
 } from '@/entities/recurring-payment'
-import { getErrorMessage } from '@/shared/api'
+import { runWithToast } from '@/shared/api'
 
 const DELETE_ERROR_MESSAGES = {
   403: 'Удалять регулярные платежи может только администратор',
@@ -13,15 +11,11 @@ const DELETE_ERROR_MESSAGES = {
 export function useDeleteRecurringPayment(payment: IRecurringPayment) {
   const [deleteMutation, { isLoading }] = useDeleteRecurringPaymentMutation()
 
-  async function remove() {
-    try {
-      await deleteMutation(payment.id).unwrap()
-      toast.success(`Платёж "${payment.name}" удалён`)
-      return true
-    } catch (error) {
-      toast.error(getErrorMessage(error, DELETE_ERROR_MESSAGES))
-      return false
-    }
+  function remove() {
+    return runWithToast(() => deleteMutation(payment.id).unwrap(), {
+      successMessage: `Платёж "${payment.name}" удалён`,
+      errorMessages: DELETE_ERROR_MESSAGES,
+    })
   }
 
   return { remove, isLoading }
