@@ -1,3 +1,6 @@
 import { Outlet } from 'react-router'
 
-export const ProtectedRoute = () => <Outlet />
+// Session check is added at the session step
+export function ProtectedRoute() {
+  return <Outlet />
+}

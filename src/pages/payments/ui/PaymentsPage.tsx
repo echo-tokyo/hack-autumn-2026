@@ -1,1 +1,3 @@
-export const PaymentsPage = () => <h1>Платежи</h1>
+export function PaymentsPage() {
+  return <h1>Платежи</h1>
+}
