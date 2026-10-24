@@ -767,6 +767,9 @@ const docTemplate = `{
                 "notifiedAt": {
                     "type": "string"
                 },
+                "overdueDays": {
+                    "type": "integer"
+                },
                 "paymentDate": {
                     "type": "string"
                 },

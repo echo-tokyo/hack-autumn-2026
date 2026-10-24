@@ -44,7 +44,7 @@ func (u *UC) List(filter occurrence.ListFilter) ([]*entity.PaymentOccurrence, er
 	}
 
 	for _, occ := range occurrences {
-		occ.IsOverdue = isOverdue(occ, today)
+		occ.IsOverdue, occ.OverdueDays = computeOverdue(occ, today)
 	}
 
 	return occurrences, nil
@@ -66,7 +66,7 @@ func (u *UC) GetByID(id int32) (*entity.PaymentOccurrence, error) {
 		return nil, fmt.Errorf("resolve today: %w", err)
 	}
 
-	occ.IsOverdue = isOverdue(occ, today)
+	occ.IsOverdue, occ.OverdueDays = computeOverdue(occ, today)
 	return occ, nil
 }
 
@@ -126,7 +126,7 @@ func (u *UC) Update(id int32, input occurrence.UpdateInput) (*entity.PaymentOccu
 		return nil, fmt.Errorf("update: %w", err)
 	}
 
-	occ.IsOverdue = isOverdue(occ, today)
+	occ.IsOverdue, occ.OverdueDays = computeOverdue(occ, today)
 	return occ, nil
 }
 
@@ -164,15 +164,29 @@ func (u *UC) today() (time.Time, error) {
 	return time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, u.cfg.Timezone), nil
 }
 
-// isOverdue reports whether occurrence is overdue.
-// Overdue = not paid AND today > due_date.
-// Payment on due_date is on time.
-// Once paid, occurrence is never overdue (even if paid late).
-func isOverdue(occ *entity.PaymentOccurrence, today time.Time) bool {
+// computeOverdue returns whether the occurrence is overdue and
+// for how many calendar days it has been overdue as of today.
+func computeOverdue(occ *entity.PaymentOccurrence, today time.Time) (bool, int32) {
 	if occ.IsPaid {
-		return false
+		return false, 0
 	}
-	return today.Format("2006-01-02") > occ.DueDate.Format("2006-01-02")
+
+	dueDate := time.Date(
+		occ.DueDate.Year(), occ.DueDate.Month(), occ.DueDate.Day(),
+		0, 0, 0, 0, time.UTC,
+	)
+	todayDate := time.Date(
+		today.Year(), today.Month(), today.Day(),
+		0, 0, 0, 0, time.UTC,
+	)
+
+	if !todayDate.After(dueDate) {
+		// today <= due_date: not overdue yet (or exactly on due date).
+		return false, 0
+	}
+
+	days := int32(todayDate.Sub(dueDate).Hours() / 24)
+	return true, days
 }
 
 // truncateToDate returns time at 00:00:00 UTC of the same calendar day.
