@@ -1,33 +1,19 @@
 import { delay, http, HttpResponse } from 'msw'
 
 import { findUserById, mockUsers, toUserDto } from '../db/users'
-
-const BASE_URL = import.meta.env.VITE_API_BASE_URL
-
-const ACCESS_COOKIE = 'access_token'
-const REFRESH_COOKIE = 'refresh_token'
-const ACCESS_TTL_MS = 60 * 1000
+import {
+  ACCESS_COOKIE,
+  accessCookie,
+  BASE_URL,
+  getSessionUser,
+  REFRESH_COOKIE,
+  refreshCookie,
+  unauthorized,
+} from '../session'
 
 interface ILoginBody {
   login: string
   password: string
-}
-
-function accessCookie(userId: number) {
-  return `${ACCESS_COOKIE}=${userId}.${Date.now() + ACCESS_TTL_MS}; Path=/`
-}
-
-function refreshCookie(userId: number) {
-  return `${REFRESH_COOKIE}=${userId}; Path=/`
-}
-
-function getUserIdFromAccess(token: string | undefined) {
-  const [userId, expiresAt] = token?.split('.') ?? []
-  return Number(expiresAt) > Date.now() ? userId : undefined
-}
-
-function unauthorized() {
-  return HttpResponse.json({ message: 'Требуется вход' }, { status: 401 })
 }
 
 export const authHandlers = [
@@ -57,7 +43,7 @@ export const authHandlers = [
 
   http.get(`${BASE_URL}/auth/me`, async ({ cookies }) => {
     await delay()
-    const user = findUserById(getUserIdFromAccess(cookies[ACCESS_COOKIE]))
+    const user = getSessionUser(cookies)
 
     return user ? HttpResponse.json(toUserDto(user)) : unauthorized()
   }),

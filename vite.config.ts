@@ -6,6 +6,7 @@ import { defineConfig } from 'vite'
 
 export default defineConfig({
   plugins: [react(), babel({ presets: [reactCompilerPreset()] })],
+  envPrefix: ['VITE_', 'TIMEZONE'],
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
