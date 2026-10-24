@@ -164,29 +164,37 @@ func (u *UC) today() (time.Time, error) {
 	return time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, u.cfg.Timezone), nil
 }
 
-// computeOverdue returns whether the occurrence is overdue and
-// for how many calendar days it has been overdue as of today.
+// computeOverdue returns whether the occurrence is currently overdue
+// and the number of days it has been (or was) overdue.
 func computeOverdue(occ *entity.PaymentOccurrence, today time.Time) (bool, int32) {
+	due := dateOnly(occ.DueDate)
+
 	if occ.IsPaid {
-		return false, 0
+		if occ.PaymentDate == nil {
+			// Defensive: inconsistent state, treat as paid on due date.
+			return false, 0
+		}
+		paid := dateOnly(*occ.PaymentDate)
+		if !paid.After(due) {
+			// paid on time or early
+			return false, 0
+		}
+		days := int32(paid.Sub(due).Hours() / 24)
+		return false, days
 	}
 
-	dueDate := time.Date(
-		occ.DueDate.Year(), occ.DueDate.Month(), occ.DueDate.Day(),
-		0, 0, 0, 0, time.UTC,
-	)
-	todayDate := time.Date(
-		today.Year(), today.Month(), today.Day(),
-		0, 0, 0, 0, time.UTC,
-	)
-
-	if !todayDate.After(dueDate) {
-		// today <= due_date: not overdue yet (or exactly on due date).
+	todayDate := dateOnly(today)
+	if !todayDate.After(due) {
+		// not yet due, or exactly on due date
 		return false, 0
 	}
-
-	days := int32(todayDate.Sub(dueDate).Hours() / 24)
+	days := int32(todayDate.Sub(due).Hours() / 24)
 	return true, days
+}
+
+// dateOnly truncates t to midnight UTC keeping the same calendar day.
+func dateOnly(t time.Time) time.Time {
+	return time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, time.UTC)
 }
 
 // truncateToDate returns time at 00:00:00 UTC of the same calendar day.
