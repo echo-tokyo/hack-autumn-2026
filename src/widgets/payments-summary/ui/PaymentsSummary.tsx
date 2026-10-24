@@ -16,7 +16,7 @@ import {
   useGetPaymentsSummaryQuery,
 } from '@/entities/payment-summary'
 
-const SKELETON_HEIGHT = 120
+const SKELETON_HEIGHT = 80
 const HINT = 'Суммы считаются отдельно по каждой валюте, без конвертации'
 
 export function PaymentsSummary() {

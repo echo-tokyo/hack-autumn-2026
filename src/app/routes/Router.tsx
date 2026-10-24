@@ -2,6 +2,7 @@ import { createBrowserRouter } from 'react-router'
 
 import { LoginPage } from '@/pages/login'
 import { NotFoundPage } from '@/pages/not-found'
+import { OccurrencesPage } from '@/pages/occurrences'
 import { PaymentsPage } from '@/pages/payments'
 import { ROUTES } from '@/shared/config'
 
@@ -21,6 +22,7 @@ export const router = createBrowserRouter([
             Component: MainLayout,
             children: [
               { path: ROUTES.payments, Component: PaymentsPage },
+              { path: ROUTES.occurrences, Component: OccurrencesPage },
               { path: '*', Component: NotFoundPage },
             ],
           },

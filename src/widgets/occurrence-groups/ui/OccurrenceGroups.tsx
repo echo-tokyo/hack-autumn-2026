@@ -12,7 +12,7 @@ import {
 } from '../model/group-occurrences'
 import { GroupMessage, OccurrenceGroup } from './OccurrenceGroup'
 
-const SKELETON_ROWS = 4
+const SKELETON_ROWS = 3
 
 interface IOccurrenceGroupsProps {
   keys: TOccurrenceGroupKey[]
