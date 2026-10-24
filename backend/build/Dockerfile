@@ -27,6 +27,8 @@ WORKDIR /app
 
 # copy compiled app
 COPY --from=build /go/src/main .
+# copy swagger docs
+COPY ./docs ./docs
 
 # run app
 CMD ["/bin/sh", "-c", "/app/main"]
