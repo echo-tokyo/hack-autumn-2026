@@ -1,12 +1,13 @@
-import { Stack, Title } from '@mantine/core'
+import { Stack } from '@mantine/core'
 
-import { OccurrencesTable } from '@/widgets/occurrences-table'
+import { PageHeader } from '@/shared/ui'
+import { PaymentOccurrences } from '@/widgets/occurrences'
 
 export function OccurrencesPage() {
   return (
-    <Stack gap='xl'>
-      <Title order={1}>Периоды оплат</Title>
-      <OccurrencesTable />
+    <Stack gap='xl' flex={1} mih={0}>
+      <PageHeader title='Периоды оплат' />
+      <PaymentOccurrences />
     </Stack>
   )
 }

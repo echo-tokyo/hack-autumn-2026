@@ -1,4 +1,5 @@
 import {
+  ActionIcon,
   Button,
   createTheme,
   type CSSVariablesResolver,
@@ -108,6 +109,19 @@ export const theme = createTheme({
   },
 
   components: {
+    ActionIcon: ActionIcon.extend({
+      vars: (_theme, props) => ({
+        root:
+          props.variant === 'secondary'
+            ? {
+                '--ai-bg': 'var(--mantine-color-dark-5)',
+                '--ai-hover': 'var(--mantine-color-dark-4)',
+                '--ai-color': 'var(--mantine-color-white)',
+                '--ai-bd': 'none',
+              }
+            : {},
+      }),
+    }),
     Button: Button.extend({
       defaultProps: { color: 'brand', size: 'md' },
       vars: (_theme, props) => ({
@@ -115,6 +129,19 @@ export const theme = createTheme({
       }),
     }),
     Input: { defaultProps: { variant: 'filled' } },
+    SegmentedControl: {
+      defaultProps: { size: 'md' },
+      styles: {
+        root: {
+          height: 'calc(2.625rem * var(--mantine-scale))',
+          boxSizing: 'border-box',
+          backgroundColor: 'var(--mantine-color-dark-5)',
+        },
+        indicator: { backgroundColor: 'var(--mantine-color-dark-3)' },
+        control: { display: 'flex' },
+        label: { display: 'flex', alignItems: 'center' },
+      },
+    },
     TextInput: { defaultProps: { size: 'md' } },
     PasswordInput: { defaultProps: { size: 'md' } },
     Select: { defaultProps: { size: 'md' } },
@@ -143,6 +170,7 @@ export const theme = createTheme({
     Table: {
       styles: {
         th: {
+          backgroundColor: 'var(--color-surface-2)',
           fontWeight: 400,
           color: 'var(--mantine-color-dimmed)',
         },

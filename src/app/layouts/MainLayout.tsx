@@ -40,12 +40,7 @@ export function MainLayout() {
       </AppShell.Navbar>
 
       <AppShell.Main className={styles.main}>
-        <Paper
-          className={styles.panel}
-          bg='var(--color-surface-1)'
-          radius='xl'
-          p={{ base: 'md', sm: 'xl' }}
-        >
+        <Paper className={styles.panel} bg='var(--color-surface-1)' radius='xl'>
           <Outlet />
         </Paper>
       </AppShell.Main>

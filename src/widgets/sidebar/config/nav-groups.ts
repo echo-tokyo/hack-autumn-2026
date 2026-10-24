@@ -1,6 +1,6 @@
 import {
   type Icon,
-  IconCalendarFilled,
+  IconLayoutDashboardFilled,
   IconListDetailsFilled,
   IconReceiptFilled,
   IconUserFilled,
@@ -25,7 +25,11 @@ export const NAV_GROUPS: INavGroup[] = [
     label: 'Платежи',
     adminOnly: false,
     items: [
-      { label: 'Сводка', to: ROUTES.payments, icon: IconCalendarFilled },
+      {
+        label: 'Сводка',
+        to: ROUTES.payments,
+        icon: IconLayoutDashboardFilled,
+      },
       {
         label: 'Периоды оплат',
         to: ROUTES.occurrences,

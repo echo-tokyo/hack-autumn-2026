@@ -1,21 +1,17 @@
-import { Group, Stack, Text, Title } from '@mantine/core'
+import { Stack } from '@mantine/core'
 
 import { CreateUserButton } from '@/features/create-user'
+import { PageHeader } from '@/shared/ui'
 import { UsersTable } from '@/widgets/users-table'
 
 export function UsersPage() {
   return (
-    <Stack gap='xl'>
-      <Group justify='space-between' align='flex-end' gap='md'>
-        <Stack gap='xs'>
-          <Title order={1}>Пользователи</Title>
-          <Text c='dimmed'>
-            Администратор создаёт, меняет и удаляет обычных пользователей. Свою
-            учётную запись он задаёт в .env.
-          </Text>
-        </Stack>
-        <CreateUserButton />
-      </Group>
+    <Stack gap='xl' flex={1} mih={0}>
+      <PageHeader
+        title='Пользователи'
+        description='Администратор создаёт, меняет и удаляет обычных пользователей. Свою учётную запись он задаёт в .env.'
+        action={<CreateUserButton />}
+      />
       <UsersTable />
     </Stack>
   )

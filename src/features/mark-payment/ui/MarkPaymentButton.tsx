@@ -5,6 +5,8 @@ import type { IPaymentOccurrence } from '@/entities/payment-occurrence'
 
 import { MarkPaymentForm } from './MarkPaymentForm'
 
+const BUTTON_WIDTH = 164
+
 interface IMarkPaymentButtonProps {
   occurrence: IPaymentOccurrence
 }
@@ -18,6 +20,7 @@ export function MarkPaymentButton({ occurrence }: IMarkPaymentButtonProps) {
       <Button
         variant='secondary'
         size='sm'
+        w={BUTTON_WIDTH}
         aria-label={`${label}: ${occurrence.name}`}
         onClick={open}
       >

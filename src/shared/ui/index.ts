@@ -1,5 +1,8 @@
 export { Logo } from './logo/Logo'
 export { MessageScreen } from './message-screen/MessageScreen'
+export { MonthCalendar } from './month-calendar/MonthCalendar'
+export { PageHeader } from './page-header/PageHeader'
 export { Panel } from './panel/Panel'
 export { QueryError } from './query-error/QueryError'
+export { ScrollTable } from './scroll-table/ScrollTable'
 export { SkeletonRows } from './skeleton-rows/SkeletonRows'

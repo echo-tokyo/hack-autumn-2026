@@ -1,8 +1,22 @@
 .main {
   display: flex;
   flex-direction: column;
+  height: 100dvh;
 }
 
 .panel {
+  --page-padding: var(--mantine-spacing-md);
+
+  display: flex;
   flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  padding: var(--page-padding);
+  overflow-y: auto;
+}
+
+@media (min-width: 48em) {
+  .panel {
+    --page-padding: var(--mantine-spacing-xl);
+  }
 }

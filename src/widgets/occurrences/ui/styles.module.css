@@ -1,0 +1,53 @@
+.layout {
+  display: flex;
+  flex: 1;
+  gap: var(--mantine-spacing-lg);
+  min-height: 0;
+}
+
+.aside {
+  display: flex;
+  flex-shrink: 0;
+  flex-direction: column;
+  width: 300px;
+  min-height: 0;
+  padding-left: var(--mantine-spacing-lg);
+  border-left: 1px solid var(--color-border);
+}
+
+.asideHeader {
+  flex-shrink: 0;
+  min-height: calc(
+    2.625rem * var(--mantine-scale) + var(--mantine-spacing-xs) * 2
+  );
+}
+
+.asideContent {
+  --scrollbar-size: 12px;
+
+  flex: 1;
+  min-height: 0;
+  padding-right: calc(var(--mantine-spacing-lg) - var(--scrollbar-size));
+  margin-right: calc(var(--mantine-spacing-lg) * -1);
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+
+.asideContent > * + * {
+  padding-top: var(--mantine-spacing-md);
+  margin-top: var(--mantine-spacing-md);
+  border-top: 1px solid var(--color-border);
+}
+
+@media (max-width: 75em) {
+  .layout {
+    flex-direction: column;
+  }
+
+  .aside {
+    width: auto;
+    padding: var(--mantine-spacing-md) 0 0;
+    border-top: 1px solid var(--color-border);
+    border-left: 0;
+  }
+}

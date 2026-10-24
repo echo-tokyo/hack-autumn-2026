@@ -1,0 +1,6 @@
+.chip {
+  flex-shrink: 0;
+  padding: 2px var(--mantine-spacing-xs);
+  background-color: var(--color-surface-3);
+  border-left: 3px solid;
+}

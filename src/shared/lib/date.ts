@@ -1,4 +1,5 @@
 import { differenceInCalendarDays, format, parseISO } from 'date-fns'
+import { ru } from 'date-fns/locale'
 
 import { SYSTEM_TIMEZONE } from '@/shared/config'
 
@@ -20,4 +21,8 @@ export function daysBetween(fromIso: string, toIso: string): number {
 export function formatShortDate(iso: string): string {
   const isCurrentYear = iso.slice(0, 4) === todayIso().slice(0, 4)
   return format(parseISO(iso), isCurrentYear ? 'dd.MM' : 'dd.MM.yyyy')
+}
+
+export function formatLongDate(iso: string): string {
+  return format(parseISO(iso), 'd MMMM', { locale: ru })
 }

@@ -64,7 +64,6 @@ export const recurringPayments: IMockRecurringPayment[] = [
   },
 ]
 
-let nextRecurringPaymentId = recurringPayments.length + 1
 let nextOccurrenceId = 1
 
 function createOccurrence(
@@ -102,6 +101,136 @@ export const occurrences: IMockOccurrence[] = [
   ),
   createOccurrence(3, softwareDue, null),
 ]
+
+const HISTORY_MONTHS = 5
+
+const EXTRA_PAYMENTS: {
+  name: string
+  amount: number
+  currency: TMockCurrency
+  dueOffset: number
+  lateDays: number[]
+  unpaidMonths?: number
+}[] = [
+  {
+    name: 'Хостинг сайта',
+    amount: 1490,
+    currency: 'RUB',
+    dueOffset: 4,
+    lateDays: [0, 0, 1, 0, 0],
+  },
+  {
+    name: 'Домен invoice.ru',
+    amount: 990,
+    currency: 'RUB',
+    dueOffset: 4,
+    lateDays: [0, -2, 0, 0, 0],
+  },
+  {
+    name: 'CRM',
+    amount: 79,
+    currency: 'USD',
+    dueOffset: 4,
+    lateDays: [3, 0, 0, 5, 0],
+  },
+  {
+    name: 'Облачное хранилище',
+    amount: 12,
+    currency: 'USD',
+    dueOffset: 4,
+    lateDays: [0, 0, 0, 0, 0],
+  },
+  {
+    name: 'Интернет в офисе',
+    amount: 3500,
+    currency: 'RUB',
+    dueOffset: -3,
+    lateDays: [0, 2, 0, 0, 0],
+    unpaidMonths: 1,
+  },
+  {
+    name: 'Мобильная связь',
+    amount: 2400,
+    currency: 'RUB',
+    dueOffset: 8,
+    lateDays: [0, 0, 0, -1, 0],
+  },
+  {
+    name: 'Бухгалтерия онлайн',
+    amount: 4900,
+    currency: 'RUB',
+    dueOffset: -1,
+    lateDays: [1, 0, 0, 0, 2],
+  },
+  {
+    name: 'Figma',
+    amount: 45,
+    currency: 'EUR',
+    dueOffset: 15,
+    lateDays: [0, 0, 0, 0, 0],
+  },
+  {
+    name: 'GitHub Team',
+    amount: 40,
+    currency: 'USD',
+    dueOffset: 15,
+    lateDays: [0, 1, 0, 0, 0],
+  },
+  {
+    name: 'Уборка офиса',
+    amount: 15000,
+    currency: 'RUB',
+    dueOffset: 20,
+    lateDays: [0, 0, 4, 0, 0],
+  },
+  {
+    name: 'Сертификат SSL',
+    amount: 9,
+    currency: 'EUR',
+    dueOffset: -9,
+    lateDays: [0, 0, 0, 0, 0],
+    unpaidMonths: 2,
+  },
+  {
+    name: 'Резервное копирование',
+    amount: 25.5,
+    currency: 'EUR',
+    dueOffset: 25,
+    lateDays: [0, 0, 0, 1, 0],
+  },
+]
+
+for (const extra of EXTRA_PAYMENTS) {
+  const id = recurringPayments.length + 1
+  const due = addDays(today, extra.dueOffset)
+  const unpaidMonths = extra.unpaidMonths ?? 0
+
+  recurringPayments.push({
+    id,
+    name: extra.name,
+    amount: extra.amount,
+    currency: extra.currency,
+    period: 'monthly',
+    dayOfMonth: dayOfMonth(due),
+    isActive: true,
+  })
+
+  for (let month = HISTORY_MONTHS; month >= 1; month -= 1) {
+    const monthDue = monthsBefore(due, month)
+    const isUnpaid = month <= unpaidMonths
+    occurrences.push(
+      createOccurrence(
+        id,
+        monthDue,
+        isUnpaid ? null : addDays(monthDue, extra.lateDays[month - 1] ?? 0),
+      ),
+    )
+  }
+
+  occurrences.push(createOccurrence(id, due, null))
+}
+
+let nextRecurringPaymentId = recurringPayments.length + 1
 
 function latestDueDate(recurringPaymentId: number) {
   return occurrences
