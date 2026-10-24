@@ -12,11 +12,14 @@ import (
 	"syscall"
 
 	"backend/config"
+	"backend/internal/app/service/occurrence"
 	"backend/internal/app/service/server"
 	"backend/internal/pkg/cache"
 	"backend/internal/pkg/db"
 	"backend/internal/pkg/logger"
 	"backend/internal/pkg/validator"
+
+	"github.com/shopspring/decimal"
 )
 
 // Ensure server implements interface.
@@ -40,6 +43,8 @@ type App struct {
 
 // NewServer returns a new instance of [App] with services to start HTTP-server.
 func NewServer() (*App, error) {
+	decimal.MarshalJSONWithoutQuotes = true
+
 	// load config
 	cfg, err := config.New()
 	if err != nil {
@@ -79,10 +84,12 @@ func NewServer() (*App, error) {
 	if err != nil {
 		return nil, fmt.Errorf("create server service: %w", err)
 	}
+	// init occurrence service
+	occ := occurrence.New(cfg, dbStorage)
 
 	return &App{
 		cfg:      cfg,
-		services: []Service{srv},
+		services: []Service{srv, occ},
 	}, nil
 }
 

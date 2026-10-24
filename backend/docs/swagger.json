@@ -143,6 +143,360 @@
                 }
             }
         },
+        "/payment-occurrences": {
+            "get": {
+                "security": [
+                    {
+                        "JWTAccess": []
+                    }
+                ],
+                "description": "Возвращает периоды с фильтрами по родительскому платежу, валюте и статусу.\nДля каждого периода вычисляется is_overdue.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "payment-occurrences"
+                ],
+                "summary": "Список периодов регулярных платежей.",
+                "operationId": "payment-occurrences-list",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "фильтр по id регулярного платежа",
+                        "name": "recurring_payment_id",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "RUB",
+                            "USD",
+                            "EUR"
+                        ],
+                        "type": "string",
+                        "description": "фильтр по валюте",
+                        "name": "currency",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "paid",
+                            "unpaid",
+                            "overdue"
+                        ],
+                        "type": "string",
+                        "description": "фильтр по статусу",
+                        "name": "status",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.PaymentOccurrence"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "неверные параметры фильтрации"
+                    },
+                    "401": {
+                        "description": "неверный токен"
+                    },
+                    "500": {
+                        "description": "внутренняя ошибка"
+                    }
+                }
+            }
+        },
+        "/payment-occurrences/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "JWTAccess": []
+                    }
+                ],
+                "description": "Возвращает конкретный период по id. Для периода вычисляется is_overdue.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "payment-occurrences"
+                ],
+                "summary": "Получить период регулярного платежа.",
+                "operationId": "payment-occurrences-get",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "id периода",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.PaymentOccurrence"
+                        }
+                    },
+                    "400": {
+                        "description": "неверный id"
+                    },
+                    "401": {
+                        "description": "неверный токен"
+                    },
+                    "404": {
+                        "description": "период не найден"
+                    },
+                    "500": {
+                        "description": "внутренняя ошибка"
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "JWTAccess": []
+                    }
+                ],
+                "description": "Подтверждение/отмена оплаты и исправление фактической даты оплаты.\nЕсли is_paid=false — фактическая дата очищается.\nЕсли дата в будущем — ошибка 400.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "payment-occurrences"
+                ],
+                "summary": "Обновить оплату периода.",
+                "operationId": "payment-occurrences-update",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "id периода",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "изменения статуса и/или даты оплаты",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.updateOccurrenceBody"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.PaymentOccurrence"
+                        }
+                    },
+                    "400": {
+                        "description": "неверное тело запроса или значения"
+                    },
+                    "401": {
+                        "description": "неверный токен"
+                    },
+                    "404": {
+                        "description": "период не найден"
+                    },
+                    "500": {
+                        "description": "внутренняя ошибка"
+                    }
+                }
+            }
+        },
+        "/payments/summary": {
+            "get": {
+                "security": [
+                    {
+                        "JWTAccess": []
+                    }
+                ],
+                "description": "Возвращает суммарные расходы по всем периодам, сгруппированные по валютам.\nКонвертация не выполняется: суммы в RUB, USD и EUR считаются отдельно.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "payments"
+                ],
+                "summary": "Итоговые суммы по валютам.",
+                "operationId": "payments-summary",
+                "responses": {
+                    "200": {
+                        "description": "суммы по валютам, ключи RUB, USD, EUR",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "неверный токен"
+                    },
+                    "500": {
+                        "description": "внутренняя ошибка"
+                    }
+                }
+            }
+        },
+        "/recurring-payments": {
+            "get": {
+                "security": [
+                    {
+                        "JWTAccess": []
+                    }
+                ],
+                "description": "Возвращает все активные (не удалённые) регулярные платежи.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "recurring-payments"
+                ],
+                "summary": "Список регулярных платежей.",
+                "operationId": "recurring-payments-list",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.RecurringPayment"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "неверный токен (пустой, истекший или неверный формат)"
+                    },
+                    "500": {
+                        "description": "внутренняя ошибка"
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "JWTAccess": []
+                    }
+                ],
+                "description": "Создаёт регулярный платёж и первый период с датой StartDate.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "recurring-payments"
+                ],
+                "summary": "Создать регулярный платёж.",
+                "operationId": "recurring-payments-create",
+                "parameters": [
+                    {
+                        "description": "данные нового регулярного платежа",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.recurringPaymentBody"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/entity.RecurringPayment"
+                        }
+                    },
+                    "400": {
+                        "description": "неверное тело запроса или параметры"
+                    },
+                    "401": {
+                        "description": "неверный токен (пустой, истекший или неверный формат)"
+                    },
+                    "403": {
+                        "description": "требуется роль администратора"
+                    },
+                    "500": {
+                        "description": "внутренняя ошибка"
+                    }
+                }
+            }
+        },
+        "/recurring-payments/{id}": {
+            "delete": {
+                "security": [
+                    {
+                        "JWTAccess": []
+                    }
+                ],
+                "description": "Мягко удаляет регулярный платёж: напоминания прекращаются, история сохраняется.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "recurring-payments"
+                ],
+                "summary": "Удалить регулярный платёж.",
+                "operationId": "recurring-payments-delete",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "id регулярного платежа",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "успешно удалён"
+                    },
+                    "400": {
+                        "description": "неверный id"
+                    },
+                    "401": {
+                        "description": "неверный токен (пустой, истекший или неверный формат)"
+                    },
+                    "403": {
+                        "description": "требуется роль администратора"
+                    },
+                    "404": {
+                        "description": "регулярный платёж не найден"
+                    },
+                    "500": {
+                        "description": "внутренняя ошибка"
+                    }
+                }
+            }
+        },
         "/users": {
             "get": {
                 "security": [
@@ -364,11 +718,97 @@
         }
     },
     "definitions": {
+        "entity.Currency": {
+            "type": "string",
+            "enum": [
+                "RUB",
+                "USD",
+                "EUR"
+            ],
+            "x-enum-varnames": [
+                "CurrencyRUB",
+                "CurrencyUSD",
+                "CurrencyEUR"
+            ]
+        },
+        "entity.PaymentOccurrence": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "number"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "currency": {
+                    "$ref": "#/definitions/entity.Currency"
+                },
+                "dueDate": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "isNotified": {
+                    "type": "boolean"
+                },
+                "isOverdue": {
+                    "type": "boolean"
+                },
+                "isPaid": {
+                    "type": "boolean"
+                },
+                "notifiedAt": {
+                    "type": "string"
+                },
+                "paymentDate": {
+                    "type": "string"
+                },
+                "recurringPaymentId": {
+                    "type": "integer"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.RecurringPayment": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "number"
+                },
+                "billingDay": {
+                    "type": "integer"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "currency": {
+                    "$ref": "#/definitions/entity.Currency"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "isDeleted": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "startDate": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
         "entity.User": {
             "type": "object",
             "required": [
                 "id",
-                "is_admin",
+                "isAdmin",
                 "username"
             ],
             "properties": {
@@ -376,7 +816,7 @@
                     "description": "user id",
                     "type": "integer"
                 },
-                "is_admin": {
+                "isAdmin": {
                     "description": "true if user is admin",
                     "type": "boolean"
                 },
@@ -409,6 +849,52 @@
                 }
             }
         },
+        "v1.recurringPaymentBody": {
+            "description": "recurringPaymentBody represents input for creating a recurring payment.",
+            "type": "object",
+            "required": [
+                "amount",
+                "billingDay",
+                "currency",
+                "name",
+                "startDate"
+            ],
+            "properties": {
+                "amount": {
+                    "description": "payment amount; JSON may be string or number, decimal parses both",
+                    "type": "number",
+                    "example": 50000
+                },
+                "billingDay": {
+                    "description": "day of month when payment is due (1-31)",
+                    "type": "integer",
+                    "maximum": 31,
+                    "minimum": 1,
+                    "example": 31
+                },
+                "currency": {
+                    "description": "payment currency",
+                    "type": "string",
+                    "enum": [
+                        "RUB",
+                        "USD",
+                        "EUR"
+                    ],
+                    "example": "RUB"
+                },
+                "name": {
+                    "description": "payment name",
+                    "type": "string",
+                    "maxLength": 255,
+                    "example": "Аренда офиса"
+                },
+                "startDate": {
+                    "description": "date of the first payment, YYYY-MM-DD",
+                    "type": "string",
+                    "example": "2026-10-31"
+                }
+            }
+        },
         "v1.updateBody": {
             "description": "updateBody represents a data to update user and profile.",
             "type": "object",
@@ -425,6 +911,22 @@
                     "type": "string",
                     "maxLength": 50,
                     "example": "user1"
+                }
+            }
+        },
+        "v1.updateOccurrenceBody": {
+            "description": "updateOccurrenceBody represents changes to apply to a payment occurrence.",
+            "type": "object",
+            "properties": {
+                "is_paid": {
+                    "description": "new payment status",
+                    "type": "boolean",
+                    "example": true
+                },
+                "payment_date": {
+                    "description": "actual payment date (YYYY-MM-DD)",
+                    "type": "string",
+                    "example": "2026-10-20"
                 }
             }
         },

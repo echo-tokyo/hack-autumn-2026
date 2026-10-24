@@ -2,12 +2,70 @@ basePath: /api/v1
 consumes:
 - application/json
 definitions:
+  entity.Currency:
+    enum:
+    - RUB
+    - USD
+    - EUR
+    type: string
+    x-enum-varnames:
+    - CurrencyRUB
+    - CurrencyUSD
+    - CurrencyEUR
+  entity.PaymentOccurrence:
+    properties:
+      amount:
+        type: number
+      createdAt:
+        type: string
+      currency:
+        $ref: '#/definitions/entity.Currency'
+      dueDate:
+        type: string
+      id:
+        type: integer
+      isNotified:
+        type: boolean
+      isOverdue:
+        type: boolean
+      isPaid:
+        type: boolean
+      notifiedAt:
+        type: string
+      paymentDate:
+        type: string
+      recurringPaymentId:
+        type: integer
+      updatedAt:
+        type: string
+    type: object
+  entity.RecurringPayment:
+    properties:
+      amount:
+        type: number
+      billingDay:
+        type: integer
+      createdAt:
+        type: string
+      currency:
+        $ref: '#/definitions/entity.Currency'
+      id:
+        type: integer
+      isDeleted:
+        type: boolean
+      name:
+        type: string
+      startDate:
+        type: string
+      updatedAt:
+        type: string
+    type: object
   entity.User:
     properties:
       id:
         description: user id
         type: integer
-      is_admin:
+      isAdmin:
         description: true if user is admin
         type: boolean
       username:
@@ -15,7 +73,7 @@ definitions:
         type: string
     required:
     - id
-    - is_admin
+    - isAdmin
     - username
     type: object
   v1.authBody:
@@ -36,6 +94,44 @@ definitions:
     - password
     - username
     type: object
+  v1.recurringPaymentBody:
+    description: recurringPaymentBody represents input for creating a recurring payment.
+    properties:
+      amount:
+        description: payment amount; JSON may be string or number, decimal parses
+          both
+        example: 50000
+        type: number
+      billingDay:
+        description: day of month when payment is due (1-31)
+        example: 31
+        maximum: 31
+        minimum: 1
+        type: integer
+      currency:
+        description: payment currency
+        enum:
+        - RUB
+        - USD
+        - EUR
+        example: RUB
+        type: string
+      name:
+        description: payment name
+        example: Аренда офиса
+        maxLength: 255
+        type: string
+      startDate:
+        description: date of the first payment, YYYY-MM-DD
+        example: "2026-10-31"
+        type: string
+    required:
+    - amount
+    - billingDay
+    - currency
+    - name
+    - startDate
+    type: object
   v1.updateBody:
     description: updateBody represents a data to update user and profile.
     properties:
@@ -49,6 +145,18 @@ definitions:
         description: user username
         example: user1
         maxLength: 50
+        type: string
+    type: object
+  v1.updateOccurrenceBody:
+    description: updateOccurrenceBody represents changes to apply to a payment occurrence.
+    properties:
+      is_paid:
+        description: new payment status
+        example: true
+        type: boolean
+      payment_date:
+        description: actual payment date (YYYY-MM-DD)
+        example: "2026-10-20"
         type: string
     type: object
   v1.userBody:
@@ -155,6 +263,242 @@ paths:
       summary: Получение access токена.
       tags:
       - auth
+  /payment-occurrences:
+    get:
+      consumes:
+      - application/json
+      description: |-
+        Возвращает периоды с фильтрами по родительскому платежу, валюте и статусу.
+        Для каждого периода вычисляется is_overdue.
+      operationId: payment-occurrences-list
+      parameters:
+      - description: фильтр по id регулярного платежа
+        in: query
+        name: recurring_payment_id
+        type: integer
+      - description: фильтр по валюте
+        enum:
+        - RUB
+        - USD
+        - EUR
+        in: query
+        name: currency
+        type: string
+      - description: фильтр по статусу
+        enum:
+        - paid
+        - unpaid
+        - overdue
+        in: query
+        name: status
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.PaymentOccurrence'
+            type: array
+        "400":
+          description: неверные параметры фильтрации
+        "401":
+          description: неверный токен
+        "500":
+          description: внутренняя ошибка
+      security:
+      - JWTAccess: []
+      summary: Список периодов регулярных платежей.
+      tags:
+      - payment-occurrences
+  /payment-occurrences/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Возвращает конкретный период по id. Для периода вычисляется is_overdue.
+      operationId: payment-occurrences-get
+      parameters:
+      - description: id периода
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.PaymentOccurrence'
+        "400":
+          description: неверный id
+        "401":
+          description: неверный токен
+        "404":
+          description: период не найден
+        "500":
+          description: внутренняя ошибка
+      security:
+      - JWTAccess: []
+      summary: Получить период регулярного платежа.
+      tags:
+      - payment-occurrences
+    patch:
+      consumes:
+      - application/json
+      description: |-
+        Подтверждение/отмена оплаты и исправление фактической даты оплаты.
+        Если is_paid=false — фактическая дата очищается.
+        Если дата в будущем — ошибка 400.
+      operationId: payment-occurrences-update
+      parameters:
+      - description: id периода
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: изменения статуса и/или даты оплаты
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.updateOccurrenceBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.PaymentOccurrence'
+        "400":
+          description: неверное тело запроса или значения
+        "401":
+          description: неверный токен
+        "404":
+          description: период не найден
+        "500":
+          description: внутренняя ошибка
+      security:
+      - JWTAccess: []
+      summary: Обновить оплату периода.
+      tags:
+      - payment-occurrences
+  /payments/summary:
+    get:
+      consumes:
+      - application/json
+      description: |-
+        Возвращает суммарные расходы по всем периодам, сгруппированные по валютам.
+        Конвертация не выполняется: суммы в RUB, USD и EUR считаются отдельно.
+      operationId: payments-summary
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: суммы по валютам, ключи RUB, USD, EUR
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: неверный токен
+        "500":
+          description: внутренняя ошибка
+      security:
+      - JWTAccess: []
+      summary: Итоговые суммы по валютам.
+      tags:
+      - payments
+  /recurring-payments:
+    get:
+      consumes:
+      - application/json
+      description: Возвращает все активные (не удалённые) регулярные платежи.
+      operationId: recurring-payments-list
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.RecurringPayment'
+            type: array
+        "401":
+          description: неверный токен (пустой, истекший или неверный формат)
+        "500":
+          description: внутренняя ошибка
+      security:
+      - JWTAccess: []
+      summary: Список регулярных платежей.
+      tags:
+      - recurring-payments
+    post:
+      consumes:
+      - application/json
+      description: Создаёт регулярный платёж и первый период с датой StartDate.
+      operationId: recurring-payments-create
+      parameters:
+      - description: данные нового регулярного платежа
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.recurringPaymentBody'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/entity.RecurringPayment'
+        "400":
+          description: неверное тело запроса или параметры
+        "401":
+          description: неверный токен (пустой, истекший или неверный формат)
+        "403":
+          description: требуется роль администратора
+        "500":
+          description: внутренняя ошибка
+      security:
+      - JWTAccess: []
+      summary: Создать регулярный платёж.
+      tags:
+      - recurring-payments
+  /recurring-payments/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: 'Мягко удаляет регулярный платёж: напоминания прекращаются, история
+        сохраняется.'
+      operationId: recurring-payments-delete
+      parameters:
+      - description: id регулярного платежа
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: успешно удалён
+        "400":
+          description: неверный id
+        "401":
+          description: неверный токен (пустой, истекший или неверный формат)
+        "403":
+          description: требуется роль администратора
+        "404":
+          description: регулярный платёж не найден
+        "500":
+          description: внутренняя ошибка
+      security:
+      - JWTAccess: []
+      summary: Удалить регулярный платёж.
+      tags:
+      - recurring-payments
   /users:
     get:
       consumes:
