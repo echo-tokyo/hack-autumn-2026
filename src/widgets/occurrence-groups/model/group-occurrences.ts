@@ -4,8 +4,10 @@ import { daysBetween } from '@/shared/lib'
 const SOON_DAYS = 14
 const RECENTLY_PAID_DAYS = 30
 
+export type TOccurrenceGroupKey = 'overdue' | 'soon' | 'later' | 'recentlyPaid'
+
 export interface IOccurrenceGroup {
-  key: 'overdue' | 'soon' | 'later' | 'recentlyPaid'
+  key: TOccurrenceGroupKey
   title: string
   emptyText: string
   items: IPaymentOccurrence[]

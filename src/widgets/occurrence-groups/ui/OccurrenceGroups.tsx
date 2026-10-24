@@ -6,12 +6,19 @@ import {
 } from '@/entities/payment-occurrence'
 import { todayIso } from '@/shared/lib'
 
-import { groupOccurrences } from '../model/group-occurrences'
+import {
+  groupOccurrences,
+  type TOccurrenceGroupKey,
+} from '../model/group-occurrences'
 import { GroupMessage, OccurrenceGroup } from './OccurrenceGroup'
 
 const SKELETON_ROWS = 4
 
-export function OccurrenceGroups() {
+interface IOccurrenceGroupsProps {
+  keys: TOccurrenceGroupKey[]
+}
+
+export function OccurrenceGroups({ keys }: IOccurrenceGroupsProps) {
   const { data, isLoading, isError, refetch } = useGetPaymentOccurrencesQuery()
   const today = todayIso()
 
@@ -36,7 +43,9 @@ export function OccurrenceGroups() {
     )
   }
 
-  const groups = groupOccurrences(data, today)
+  const groups = groupOccurrences(data, today).filter((group) =>
+    keys.includes(group.key),
+  )
 
   return (
     <Stack gap='xl'>
