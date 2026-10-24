@@ -21,7 +21,12 @@ export function DeleteUserButton({ user }: IDeleteUserButtonProps) {
 
   return (
     <>
-      <Button color='dark.5' c='var(--color-danger)' size='sm' onClick={open}>
+      <Button
+        variant='secondary-danger'
+        size='sm'
+        aria-label={`Удалить: ${user.username}`}
+        onClick={open}
+      >
         Удалить
       </Button>
       <Modal opened={isOpened} onClose={close} title='Удалить пользователя?'>
@@ -31,14 +36,10 @@ export function DeleteUserButton({ user }: IDeleteUserButtonProps) {
             которые он ставил, сохранятся.
           </Text>
           <SimpleGrid cols={2} spacing='xs' mt='xs'>
-            <Button color='dark.5' disabled={isLoading} onClick={close}>
+            <Button variant='secondary' disabled={isLoading} onClick={close}>
               Отмена
             </Button>
-            <Button
-              color='var(--color-danger)'
-              loading={isLoading}
-              onClick={handleDelete}
-            >
+            <Button variant='danger' loading={isLoading} onClick={handleDelete}>
               Удалить
             </Button>
           </SimpleGrid>

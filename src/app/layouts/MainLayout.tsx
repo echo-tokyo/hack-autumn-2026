@@ -29,7 +29,7 @@ export function MainLayout() {
             opened={isNavbarOpened}
             onClick={toggle}
             size='sm'
-            aria-label='Открыть меню'
+            aria-label={isNavbarOpened ? 'Закрыть меню' : 'Открыть меню'}
           />
           <Text fw={800}>invoice keeper</Text>
         </Group>

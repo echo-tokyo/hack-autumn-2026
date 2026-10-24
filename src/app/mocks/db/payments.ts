@@ -1,4 +1,4 @@
-import { addDays, addMonths, dayOfMonth, todayIso } from '../dates'
+import { addDays, addMonths, dayOfMonth, daysBetween, todayIso } from '../dates'
 
 export type TMockCurrency = 'RUB' | 'USD' | 'EUR'
 
@@ -111,6 +111,17 @@ function latestDueDate(recurringPaymentId: number) {
     .at(-1)
 }
 
+function nextDueDate(recurringPaymentId: number) {
+  const unpaidDueDates = occurrences
+    .filter(
+      (item) => item.recurringPaymentId === recurringPaymentId && !item.isPaid,
+    )
+    .map((item) => item.dueDate)
+    .sort()
+
+  return unpaidDueDates[0] ?? latestDueDate(recurringPaymentId)
+}
+
 export function ensureUpcomingOccurrences() {
   const currentDate = todayIso()
 
@@ -136,11 +147,27 @@ export function isOverdueAt(occurrence: IMockOccurrence, date: string) {
   return isUnpaidAt(occurrence, date) && occurrence.dueDate < date
 }
 
+function overdueDays(occurrence: IMockOccurrence) {
+  return Math.max(
+    0,
+    daysBetween(occurrence.dueDate, occurrence.paymentDate ?? todayIso()),
+  )
+}
+
+function occurrenceStatus(occurrence: IMockOccurrence) {
+  if (occurrence.isPaid) {
+    return 'paid'
+  }
+  return overdueDays(occurrence) > 0 ? 'overdue' : 'unpaid'
+}
+
 export function toOccurrenceDto(occurrence: IMockOccurrence) {
   const payment = findRecurringPayment(occurrence.recurringPaymentId)
 
   return {
     ...occurrence,
+    status: occurrenceStatus(occurrence),
+    overdueDays: overdueDays(occurrence),
     name: payment?.name ?? '',
     amount: payment?.amount ?? 0,
     currency: payment?.currency ?? 'RUB',
@@ -150,7 +177,7 @@ export function toOccurrenceDto(occurrence: IMockOccurrence) {
 export function toRecurringPaymentDto(payment: IMockRecurringPayment) {
   const { id, name, amount, currency, period } = payment
 
-  return { id, name, amount, currency, period, nextDueDate: latestDueDate(id) }
+  return { id, name, amount, currency, period, nextDueDate: nextDueDate(id) }
 }
 
 export function createRecurringPayment(input: INewRecurringPayment) {

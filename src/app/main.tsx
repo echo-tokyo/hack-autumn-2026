@@ -16,7 +16,7 @@ import { Toaster } from 'sonner'
 import { cssVariablesResolver, theme } from '@/shared/config'
 
 import { store } from './model/store'
-import { router } from './routes/Router'
+import { router } from './routes/router'
 
 async function enableMocking() {
   if (import.meta.env.VITE_API_MOCKS !== 'true') {

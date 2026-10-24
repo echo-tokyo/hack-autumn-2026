@@ -1,4 +1,5 @@
 export { Logo } from './logo/Logo'
 export { MessageScreen } from './message-screen/MessageScreen'
 export { Panel } from './panel/Panel'
+export { QueryError } from './query-error/QueryError'
 export { SkeletonRows } from './skeleton-rows/SkeletonRows'

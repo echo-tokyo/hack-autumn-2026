@@ -7,6 +7,6 @@ export type {
   IPaymentOccurrence,
   IPaymentOccurrencesFilter,
   IUpdatePaymentOccurrence,
-  TOccurrenceStatusFilter,
+  TOccurrenceStatus,
 } from './model/types'
 export { OccurrenceRow } from './ui/OccurrenceRow'

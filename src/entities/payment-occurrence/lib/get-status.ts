@@ -1,23 +1,14 @@
-import { daysBetween } from '@/shared/lib'
+import type { TOccurrenceStatus } from '../model/types'
 
-import type { IPaymentOccurrence } from '../model/types'
+const STATUS_VIEWS: Record<
+  TOccurrenceStatus,
+  { label: string; color: string | undefined }
+> = {
+  paid: { label: 'Оплачено', color: 'var(--color-success)' },
+  overdue: { label: 'Просрочено', color: 'var(--color-danger)' },
+  unpaid: { label: 'Ожидает оплаты', color: undefined },
+}
 
-export function getOccurrenceStatus(
-  occurrence: IPaymentOccurrence,
-  today: string,
-) {
-  const overdueDays = Math.max(
-    0,
-    daysBetween(occurrence.dueDate, occurrence.paymentDate ?? today),
-  )
-
-  if (occurrence.isPaid) {
-    return { label: 'Оплачено', color: 'var(--color-success)', overdueDays }
-  }
-
-  if (overdueDays > 0) {
-    return { label: 'Просрочено', color: 'var(--color-danger)', overdueDays }
-  }
-
-  return { label: 'Ожидает оплаты', color: undefined, overdueDays }
+export function getOccurrenceStatus(status: TOccurrenceStatus) {
+  return STATUS_VIEWS[status]
 }

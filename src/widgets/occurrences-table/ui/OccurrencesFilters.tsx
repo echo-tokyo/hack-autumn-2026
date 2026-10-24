@@ -2,12 +2,17 @@ import { Group, SegmentedControl, Select } from '@mantine/core'
 
 import type {
   IPaymentOccurrencesFilter,
-  TOccurrenceStatusFilter,
+  TOccurrenceStatus,
 } from '@/entities/payment-occurrence'
 import { CURRENCIES, type TCurrency } from '@/shared/config'
 
-const STATUS_OPTIONS = [
-  { value: 'all', label: 'Все' },
+const ALL_STATUSES = 'all'
+
+const STATUS_OPTIONS: {
+  value: TOccurrenceStatus | typeof ALL_STATUSES
+  label: string
+}[] = [
+  { value: ALL_STATUSES, label: 'Все' },
   { value: 'unpaid', label: 'Не оплачено' },
   { value: 'overdue', label: 'Просрочено' },
   { value: 'paid', label: 'Оплачено' },
@@ -22,22 +27,19 @@ export function OccurrencesFilters({
   filter,
   onChange,
 }: IOccurrencesFiltersProps) {
-  function handleStatusChange(value: string) {
-    onChange({
-      ...filter,
-      status: value === 'all' ? undefined : (value as TOccurrenceStatusFilter),
-    })
+  function handleStatusChange(value: TOccurrenceStatus | typeof ALL_STATUSES) {
+    onChange({ ...filter, status: value === ALL_STATUSES ? undefined : value })
   }
 
-  function handleCurrencyChange(value: string | null) {
-    onChange({ ...filter, currency: (value as TCurrency | null) ?? undefined })
+  function handleCurrencyChange(value: TCurrency | null) {
+    onChange({ ...filter, currency: value ?? undefined })
   }
 
   return (
     <Group gap='md'>
       <SegmentedControl
         data={STATUS_OPTIONS}
-        value={filter.status ?? 'all'}
+        value={filter.status ?? ALL_STATUSES}
         onChange={handleStatusChange}
         aria-label='Статус'
       />

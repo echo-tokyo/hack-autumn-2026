@@ -1,6 +1,6 @@
 import type { TCurrency } from '@/shared/config'
 
-export type TOccurrenceStatusFilter = 'paid' | 'unpaid' | 'overdue'
+export type TOccurrenceStatus = 'paid' | 'unpaid' | 'overdue'
 
 export interface IPaymentOccurrence {
   id: number
@@ -11,10 +11,12 @@ export interface IPaymentOccurrence {
   dueDate: string
   isPaid: boolean
   paymentDate: string | null
+  status: TOccurrenceStatus
+  overdueDays: number
 }
 
 export interface IPaymentOccurrencesFilter {
-  status?: TOccurrenceStatusFilter
+  status?: TOccurrenceStatus
   currency?: TCurrency
 }
 

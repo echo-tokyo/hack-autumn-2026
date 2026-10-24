@@ -13,10 +13,10 @@ import { Controller, useForm } from 'react-hook-form'
 
 import { PERIOD_LABELS } from '@/entities/recurring-payment'
 import { CURRENCIES } from '@/shared/config'
-import { todayIso } from '@/shared/lib'
 
 import {
   recurringPaymentSchema,
+  type TRecurringPaymentInput,
   type TRecurringPaymentSchema,
 } from '../model/schema'
 import { useCreateRecurringPayment } from '../model/use-create-recurring-payment'
@@ -35,7 +35,7 @@ export function CreateRecurringPaymentForm({
     control,
     handleSubmit,
     formState: { isDirty, isSubmitting },
-  } = useForm<TRecurringPaymentSchema>({
+  } = useForm<TRecurringPaymentInput, unknown, TRecurringPaymentSchema>({
     resolver: zodResolver(recurringPaymentSchema),
     defaultValues: { name: '', currency: 'RUB', period: 'monthly' },
   })
@@ -75,12 +75,12 @@ export function CreateRecurringPaymentForm({
                 min={0}
                 thousandSeparator=' '
                 decimalSeparator=','
+                decimalScale={2}
                 hideControls
                 error={fieldState.error?.message}
+                ref={field.ref}
                 value={field.value ?? ''}
-                onChange={(value) =>
-                  field.onChange(typeof value === 'number' ? value : undefined)
-                }
+                onChange={field.onChange}
                 onBlur={field.onBlur}
               />
             )}
@@ -110,8 +110,8 @@ export function CreateRecurringPaymentForm({
                 withAsterisk
                 placeholder='дд.мм.гггг'
                 valueFormat='DD.MM.YYYY'
-                minDate={todayIso()}
                 error={fieldState.error?.message}
+                ref={field.ref}
                 value={field.value ?? null}
                 onChange={(value) => field.onChange(value ?? undefined)}
               />

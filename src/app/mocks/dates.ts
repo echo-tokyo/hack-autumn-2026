@@ -1,4 +1,4 @@
-export { todayIso } from '@/shared/lib'
+export { daysBetween, todayIso } from '@/shared/lib'
 
 function toIsoDate(date: Date) {
   const year = date.getFullYear()

@@ -8,7 +8,7 @@ export function PaymentsPage() {
     <Stack gap='xl'>
       <Title order={1}>Сводка</Title>
       <PaymentsSummary />
-      <OccurrenceGroups keys={['overdue', 'soon', 'later', 'recentlyPaid']} />
+      <OccurrenceGroups />
     </Stack>
   )
 }

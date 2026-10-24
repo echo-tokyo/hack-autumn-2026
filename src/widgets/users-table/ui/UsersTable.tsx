@@ -1,22 +1,27 @@
 import { Group, Table, Text } from '@mantine/core'
 
-import { isAdmin, USER_ROLE_LABELS } from '@/entities/user'
+import { isAdmin, useGetUsersQuery, USER_ROLE_LABELS } from '@/entities/user'
 import { DeleteUserButton } from '@/features/delete-user'
 import { EditUserButton } from '@/features/edit-user'
-import { Panel, SkeletonRows } from '@/shared/ui'
-
-import { useUsers } from '../model/use-users'
+import { Panel, QueryError, SkeletonRows } from '@/shared/ui'
 
 const TABLE_MIN_WIDTH = 520
 
 export function UsersTable() {
-  const { users, isLoading } = useUsers()
+  const { data: users = [], isLoading, isError, refetch } = useGetUsersQuery()
 
   return (
     <Panel px='lg' py='sm'>
       {isLoading && <SkeletonRows />}
 
-      {users.length > 0 && (
+      {!isLoading && isError && (
+        <QueryError
+          message='Не удалось загрузить пользователей.'
+          onRetry={refetch}
+        />
+      )}
+
+      {!isError && users.length > 0 && (
         <Table.ScrollContainer minWidth={TABLE_MIN_WIDTH}>
           <Table verticalSpacing='sm' layout='fixed'>
             <Table.Thead>

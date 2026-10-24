@@ -1,4 +1,5 @@
 import {
+  Button,
   createTheme,
   type CSSVariablesResolver,
   type MantineColorsTuple,
@@ -21,7 +22,7 @@ const brand: MantineColorsTuple = [
 const dark: MantineColorsTuple = [
   '#ffffff',
   '#b3b3b3',
-  '#666666',
+  '#8a8a8a',
   '#424242',
   '#2f2f2f',
   '#2b2b2b',
@@ -31,7 +32,31 @@ const dark: MantineColorsTuple = [
   '#000000',
 ]
 
+const SUCCESS_COLOR = '#2cc04d'
+const DANGER_COLOR = '#ff4d4d'
+
 const OVERLAY_SHADOW = '0 8px 32px rgba(0, 0, 0, 0.6)'
+
+const BUTTON_VARIANTS: Record<string, Record<string, string>> = {
+  secondary: {
+    '--button-bg': 'var(--mantine-color-dark-5)',
+    '--button-hover': 'var(--mantine-color-dark-4)',
+    '--button-color': 'var(--mantine-color-white)',
+    '--button-bd': 'none',
+  },
+  'secondary-danger': {
+    '--button-bg': 'var(--mantine-color-dark-5)',
+    '--button-hover': 'var(--mantine-color-dark-4)',
+    '--button-color': 'var(--color-danger)',
+    '--button-bd': 'none',
+  },
+  danger: {
+    '--button-bg': 'var(--color-danger)',
+    '--button-hover': 'color-mix(in srgb, var(--color-danger) 85%, black)',
+    '--button-color': 'var(--mantine-color-white)',
+    '--button-bd': 'none',
+  },
+}
 
 const MODAL_RISE: MantineTransition = {
   in: { opacity: 1, transform: 'translateY(0)' },
@@ -83,7 +108,12 @@ export const theme = createTheme({
   },
 
   components: {
-    Button: { defaultProps: { color: 'brand', size: 'md' } },
+    Button: Button.extend({
+      defaultProps: { color: 'brand', size: 'md' },
+      vars: (_theme, props) => ({
+        root: BUTTON_VARIANTS[props.variant ?? ''] ?? {},
+      }),
+    }),
     Input: { defaultProps: { variant: 'filled' } },
     TextInput: { defaultProps: { size: 'md' } },
     PasswordInput: { defaultProps: { size: 'md' } },
@@ -146,16 +176,16 @@ export const cssVariablesResolver: CSSVariablesResolver = () => ({
   variables: {},
   light: {},
   dark: {
-    '--mantine-color-body': '#000000',
-    '--mantine-color-error': '#ff4d4d',
-    '--color-surface-1': '#131313',
-    '--color-surface-2': '#1f1f1f',
-    '--color-surface-3': '#252525',
-    '--color-border': '#2f2f2f',
-    '--color-text-muted': '#666666',
-    '--color-text-faint': '#424242',
-    '--color-accent': '#4cc6f1',
-    '--color-success': '#2cc04d',
-    '--color-danger': '#ff4d4d',
+    '--mantine-color-body': 'var(--mantine-color-dark-9)',
+    '--mantine-color-error': DANGER_COLOR,
+    '--color-surface-1': 'var(--mantine-color-dark-8)',
+    '--color-surface-2': 'var(--mantine-color-dark-7)',
+    '--color-surface-3': 'var(--mantine-color-dark-6)',
+    '--color-border': 'var(--mantine-color-dark-4)',
+    '--color-text-muted': 'var(--mantine-color-dark-2)',
+    '--color-text-faint': 'var(--mantine-color-dark-3)',
+    '--color-accent': 'var(--mantine-color-brand-6)',
+    '--color-success': SUCCESS_COLOR,
+    '--color-danger': DANGER_COLOR,
   },
 })

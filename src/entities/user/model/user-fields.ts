@@ -11,6 +11,13 @@ export const usernameField = z
   .max(USERNAME_MAX, `Логин не длиннее ${USERNAME_MAX} символов`)
   .regex(/^[a-zA-Z0-9_.-]+$/, 'Только латиница, цифры, точка, _ и -')
 
-export const passwordField = z
+const PASSWORD_MESSAGE = `Пароль не короче ${PASSWORD_MIN} символов`
+
+export const passwordField = z.string().min(PASSWORD_MIN, PASSWORD_MESSAGE)
+
+export const optionalPasswordField = z
   .string()
-  .min(PASSWORD_MIN, `Пароль не короче ${PASSWORD_MIN} символов`)
+  .refine(
+    (value) => value === '' || value.length >= PASSWORD_MIN,
+    PASSWORD_MESSAGE,
+  )

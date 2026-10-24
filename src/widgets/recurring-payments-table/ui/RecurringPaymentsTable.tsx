@@ -1,29 +1,43 @@
 import { Table, Text } from '@mantine/core'
 
-import { PERIOD_LABELS } from '@/entities/recurring-payment'
+import {
+  PERIOD_LABELS,
+  useGetRecurringPaymentsQuery,
+} from '@/entities/recurring-payment'
 import { DeleteRecurringPaymentButton } from '@/features/delete-recurring-payment'
 import { formatAmount, formatShortDate } from '@/shared/lib'
-import { Panel, SkeletonRows } from '@/shared/ui'
-
-import { useRecurringPayments } from '../model/use-recurring-payments'
+import { Panel, QueryError, SkeletonRows } from '@/shared/ui'
 
 const TABLE_MIN_WIDTH = 720
 
 export function RecurringPaymentsTable() {
-  const { payments, isLoading } = useRecurringPayments()
+  const {
+    data: payments = [],
+    isLoading,
+    isError,
+    refetch,
+  } = useGetRecurringPaymentsQuery()
+  const isReady = !isLoading && !isError
 
   return (
     <Panel px='lg' py='sm'>
       {isLoading && <SkeletonRows />}
 
-      {!isLoading && payments.length === 0 && (
+      {!isLoading && isError && (
+        <QueryError
+          message='Не удалось загрузить регулярные платежи.'
+          onRetry={refetch}
+        />
+      )}
+
+      {isReady && payments.length === 0 && (
         <Text c='dimmed' py='sm'>
           Регулярных платежей пока нет. Добавьте первый, например аренду или
           подписку.
         </Text>
       )}
 
-      {payments.length > 0 && (
+      {isReady && payments.length > 0 && (
         <Table.ScrollContainer minWidth={TABLE_MIN_WIDTH}>
           <Table verticalSpacing='sm' layout='fixed'>
             <Table.Thead>

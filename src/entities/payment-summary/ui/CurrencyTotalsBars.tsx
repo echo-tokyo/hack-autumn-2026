@@ -8,6 +8,7 @@ import {
   Tooltip,
 } from '@mantine/core'
 
+import { CURRENCIES, type TCurrency } from '@/shared/config'
 import { formatAmount, formatMoney } from '@/shared/lib'
 
 import type { ICurrencyTotals } from '../model/types'
@@ -42,7 +43,12 @@ function CurrencyBar({ totals }: ICurrencyBarProps) {
         </Text>
       </Group>
 
-      <Progress.Root size='lg' radius='xs' bg='var(--color-surface-3)'>
+      <Progress.Root
+        size='lg'
+        radius='xs'
+        bg='var(--color-surface-3)'
+        aria-hidden
+      >
         {segments.map((segment) => (
           <Tooltip
             key={segment.key}
@@ -57,6 +63,11 @@ function CurrencyBar({ totals }: ICurrencyBarProps) {
       </Progress.Root>
 
       <Group gap='md'>
+        {segments.length === 0 && (
+          <Text fz='sm' c='dimmed'>
+            Платежей нет
+          </Text>
+        )}
         {segments.map((segment) => (
           <Group key={segment.key} gap={6} wrap='nowrap'>
             <Box w={SWATCH_SIZE} h={SWATCH_SIZE} bg={segment.color} />
@@ -70,6 +81,20 @@ function CurrencyBar({ totals }: ICurrencyBarProps) {
   )
 }
 
+function findTotals(
+  totals: ICurrencyTotals[],
+  currency: TCurrency,
+): ICurrencyTotals {
+  return (
+    totals.find((row) => row.currency === currency) ?? {
+      currency,
+      toPay: 0,
+      overdue: 0,
+      paid: 0,
+    }
+  )
+}
+
 interface ICurrencyTotalsBarsProps {
   totals: ICurrencyTotals[]
 }
@@ -77,8 +102,8 @@ interface ICurrencyTotalsBarsProps {
 export function CurrencyTotalsBars({ totals }: ICurrencyTotalsBarsProps) {
   return (
     <SimpleGrid cols={{ base: 1, md: 3 }} spacing='xl' verticalSpacing='lg'>
-      {totals.map((row) => (
-        <CurrencyBar key={row.currency} totals={row} />
+      {CURRENCIES.map((currency) => (
+        <CurrencyBar key={currency} totals={findTotals(totals, currency)} />
       ))}
     </SimpleGrid>
   )

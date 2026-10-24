@@ -12,10 +12,12 @@ import { AdminRoute } from '../layouts/AdminRoute'
 import { AppLayout } from '../layouts/AppLayout'
 import { MainLayout } from '../layouts/MainLayout'
 import { ProtectedRoute } from '../layouts/ProtectedRoute'
+import { RouteErrorBoundary } from '../layouts/RouteErrorBoundary'
 
 export const router = createBrowserRouter([
   {
     Component: AppLayout,
+    ErrorBoundary: RouteErrorBoundary,
     children: [
       { path: ROUTES.login, Component: LoginPage },
       {

@@ -1,7 +1,6 @@
 import { Button, LoadingOverlay, Stack, Text } from '@mantine/core'
 
-import { todayIso } from '@/shared/lib'
-import { Panel, SkeletonRows } from '@/shared/ui'
+import { Panel, QueryError, SkeletonRows } from '@/shared/ui'
 
 import { useOccurrencesTable } from '../model/use-occurrences-table'
 import { OccurrencesFilters } from './OccurrencesFilters'
@@ -15,8 +14,11 @@ export function OccurrencesTable() {
     isFiltered,
     occurrences,
     isLoading,
+    isError,
     isRefetching,
+    refetch,
   } = useOccurrencesTable()
+  const isReady = !isLoading && !isError
 
   return (
     <Stack gap='md'>
@@ -31,7 +33,14 @@ export function OccurrencesTable() {
 
         {isLoading && <SkeletonRows />}
 
-        {!isLoading && occurrences.length === 0 && (
+        {!isLoading && isError && (
+          <QueryError
+            message='Не удалось загрузить периоды оплат.'
+            onRetry={refetch}
+          />
+        )}
+
+        {isReady && occurrences.length === 0 && (
           <Stack gap='sm' align='flex-start' py='sm'>
             <Text c='dimmed'>
               {isFiltered
@@ -39,15 +48,15 @@ export function OccurrencesTable() {
                 : 'Периодов оплат пока нет. Они появятся, когда администратор добавит регулярный платёж.'}
             </Text>
             {isFiltered && (
-              <Button variant='default' onClick={resetFilter}>
+              <Button variant='secondary' onClick={resetFilter}>
                 Сбросить фильтры
               </Button>
             )}
           </Stack>
         )}
 
-        {occurrences.length > 0 && (
-          <OccurrencesTableView occurrences={occurrences} today={todayIso()} />
+        {isReady && occurrences.length > 0 && (
+          <OccurrencesTableView occurrences={occurrences} />
         )}
       </Panel>
     </Stack>

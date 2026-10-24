@@ -1,11 +1,9 @@
 import {
   ActionIcon,
-  Button,
   Group,
   SimpleGrid,
   Skeleton,
   Stack,
-  Text,
   Title,
   Tooltip,
 } from '@mantine/core'
@@ -16,7 +14,7 @@ import {
   useGetPaymentsSummaryQuery,
 } from '@/entities/payment-summary'
 import { ICON_SIZE } from '@/shared/config'
-import { Panel } from '@/shared/ui'
+import { Panel, QueryError } from '@/shared/ui'
 
 const SKELETON_COUNT = 3
 const SKELETON_HEIGHT = 72
@@ -45,12 +43,7 @@ export function PaymentsSummary() {
         )}
 
         {!isLoading && (isError || !data) && (
-          <Stack gap='sm' align='flex-start'>
-            <Text c='dimmed'>Не удалось загрузить итоги.</Text>
-            <Button variant='default' onClick={refetch}>
-              Повторить
-            </Button>
-          </Stack>
+          <QueryError message='Не удалось загрузить итоги.' onRetry={refetch} />
         )}
 
         {data && <CurrencyTotalsBars totals={data.totals} />}

@@ -21,7 +21,7 @@ export function groupOccurrences(
     daysBetween(today, item.dueDate)
 
   const unpaid = occurrences
-    .filter((item) => !item.isPaid)
+    .filter((item) => item.status === 'unpaid')
     .sort((a, b) => a.dueDate.localeCompare(b.dueDate))
 
   const recentlyPaid = occurrences
@@ -37,15 +37,15 @@ export function groupOccurrences(
       key: 'overdue',
       title: 'Просрочено',
       emptyText: 'Просроченных платежей нет',
-      items: unpaid.filter((item) => daysUntilDue(item) < 0),
+      items: occurrences
+        .filter((item) => item.status === 'overdue')
+        .sort((a, b) => a.dueDate.localeCompare(b.dueDate)),
     },
     {
       key: 'soon',
       title: `Ближайшие ${SOON_DAYS} дней`,
       emptyText: 'Ближайших платежей нет',
-      items: unpaid.filter(
-        (item) => daysUntilDue(item) >= 0 && daysUntilDue(item) <= SOON_DAYS,
-      ),
+      items: unpaid.filter((item) => daysUntilDue(item) <= SOON_DAYS),
     },
     {
       key: 'later',

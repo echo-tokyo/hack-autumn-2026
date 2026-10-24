@@ -15,7 +15,12 @@ export function MarkPaymentButton({ occurrence }: IMarkPaymentButtonProps) {
 
   return (
     <>
-      <Button color='dark.5' size='sm' onClick={open}>
+      <Button
+        variant='secondary'
+        size='sm'
+        aria-label={`${label}: ${occurrence.name}`}
+        onClick={open}
+      >
         {label}
       </Button>
       <Modal opened={isOpened} onClose={close} title={label}>

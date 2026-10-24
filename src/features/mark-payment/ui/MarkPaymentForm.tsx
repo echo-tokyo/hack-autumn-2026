@@ -17,17 +17,17 @@ export function MarkPaymentForm({ occurrence, onDone }: IMarkPaymentFormProps) {
   const [paymentDate, setPaymentDate] = useState<string | null>(
     occurrence.paymentDate ?? today,
   )
-  const { savePayment, cancelPayment, isLoading } = useMarkPayment(occurrence)
+  const { markPaid, cancel, isLoading } = useMarkPayment(occurrence)
   const isUnchanged = paymentDate === occurrence.paymentDate
 
   async function handleSave() {
-    if (paymentDate && (await savePayment(paymentDate))) {
+    if (paymentDate && (await markPaid(paymentDate))) {
       onDone()
     }
   }
 
   async function handleCancel() {
-    if (await cancelPayment()) {
+    if (await cancel()) {
       onDone()
     }
   }
@@ -51,8 +51,7 @@ export function MarkPaymentForm({ occurrence, onDone }: IMarkPaymentFormProps) {
       <SimpleGrid cols={occurrence.isPaid ? 2 : 1} spacing='xs' mt='xs'>
         {occurrence.isPaid && (
           <Button
-            color='dark.5'
-            c='var(--color-danger)'
+            variant='secondary-danger'
             disabled={isLoading}
             onClick={handleCancel}
           >
@@ -60,7 +59,6 @@ export function MarkPaymentForm({ occurrence, onDone }: IMarkPaymentFormProps) {
           </Button>
         )}
         <Button
-          color='brand'
           disabled={!paymentDate || isUnchanged}
           loading={isLoading}
           onClick={handleSave}

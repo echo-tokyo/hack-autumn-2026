@@ -16,4 +16,8 @@ export type {
   TUserRole,
 } from './model/types'
 export { useCurrentUser } from './model/use-current-user'
-export { passwordField, usernameField } from './model/user-fields'
+export {
+  optionalPasswordField,
+  passwordField,
+  usernameField,
+} from './model/user-fields'

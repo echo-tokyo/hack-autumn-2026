@@ -14,7 +14,12 @@ export function EditUserButton({ user }: IEditUserButtonProps) {
 
   return (
     <>
-      <Button color='dark.5' size='sm' onClick={open}>
+      <Button
+        variant='secondary'
+        size='sm'
+        aria-label={`Изменить: ${user.username}`}
+        onClick={open}
+      >
         Изменить
       </Button>
       <Modal

@@ -28,7 +28,11 @@ export const paymentOccurrenceApi = baseApi.injectEndpoints({
         method: 'PATCH',
         body,
       }),
-      invalidatesTags: ['PaymentOccurrence', 'PaymentsSummary'],
+      invalidatesTags: [
+        'PaymentOccurrence',
+        'PaymentsSummary',
+        'RecurringPayment',
+      ],
     }),
   }),
 })

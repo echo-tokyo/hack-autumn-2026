@@ -1,26 +1,19 @@
-import { Button, Stack } from '@mantine/core'
+import { Stack } from '@mantine/core'
 
 import {
   OccurrenceRow,
   useGetPaymentOccurrencesQuery,
 } from '@/entities/payment-occurrence'
+import { useServerToday } from '@/entities/payment-summary'
 import { MarkPaymentButton } from '@/features/mark-payment'
-import { todayIso } from '@/shared/lib'
-import { SkeletonRows } from '@/shared/ui'
+import { QueryError, SkeletonRows } from '@/shared/ui'
 
-import {
-  groupOccurrences,
-  type TOccurrenceGroupKey,
-} from '../model/group-occurrences'
+import { groupOccurrences } from '../model/group-occurrences'
 import { GroupMessage, OccurrenceGroup } from './OccurrenceGroup'
 
-interface IOccurrenceGroupsProps {
-  keys: TOccurrenceGroupKey[]
-}
-
-export function OccurrenceGroups({ keys }: IOccurrenceGroupsProps) {
+export function OccurrenceGroups() {
   const { data, isLoading, isError, refetch } = useGetPaymentOccurrencesQuery()
-  const today = todayIso()
+  const today = useServerToday()
 
   if (isLoading) {
     return (
@@ -33,17 +26,12 @@ export function OccurrenceGroups({ keys }: IOccurrenceGroupsProps) {
   if (isError || !data) {
     return (
       <OccurrenceGroup title='Платежи'>
-        <GroupMessage>Не удалось загрузить платежи.</GroupMessage>
-        <Button variant='default' mb='sm' onClick={refetch}>
-          Повторить
-        </Button>
+        <QueryError message='Не удалось загрузить платежи.' onRetry={refetch} />
       </OccurrenceGroup>
     )
   }
 
-  const groups = groupOccurrences(data, today).filter((group) =>
-    keys.includes(group.key),
-  )
+  const groups = groupOccurrences(data, today)
 
   return (
     <Stack gap='xl'>

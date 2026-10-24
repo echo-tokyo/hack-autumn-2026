@@ -8,13 +8,16 @@ import {
 
 const BASE_API_URL = import.meta.env.VITE_API_BASE_URL
 const REFRESH_URL = '/auth/refresh'
+const REFETCH_AFTER_SECONDS = 30
 
 const rawBaseQuery = fetchBaseQuery({
   baseUrl: BASE_API_URL,
   credentials: 'include',
 })
 
-let refreshPromise: Promise<boolean> | null = null
+const SESSION_LOST_STATUSES = new Set<FetchBaseQueryError['status']>([401, 403])
+
+let refreshPromise: Promise<FetchBaseQueryError | undefined> | null = null
 
 export interface IBaseQueryExtraOptions {
   skipReauth?: boolean
@@ -30,13 +33,13 @@ type TBaseQuery = BaseQueryFn<
 
 async function refreshSession(
   ...[, api, extraOptions]: Parameters<TBaseQuery>
-): Promise<boolean> {
-  const result = await rawBaseQuery(
+): Promise<FetchBaseQueryError | undefined> {
+  const { error } = await rawBaseQuery(
     { url: REFRESH_URL, method: 'POST' },
     api,
     extraOptions,
   )
-  return !result.error
+  return error
 }
 
 const baseQueryWithReauth: TBaseQuery = async (
@@ -58,13 +61,16 @@ const baseQueryWithReauth: TBaseQuery = async (
     refreshPromise = null
   })
 
-  const isRefreshed = await refreshPromise
+  const refreshError = await refreshPromise
 
-  if (isRefreshed) {
+  if (!refreshError) {
     return rawBaseQuery(args, api, extraOptions)
   }
 
-  if (!extraOptions.isSessionCheck) {
+  if (
+    SESSION_LOST_STATUSES.has(refreshError.status) &&
+    !extraOptions.isSessionCheck
+  ) {
     api.dispatch(baseApi.util.resetApiState())
   }
 
@@ -74,6 +80,9 @@ const baseQueryWithReauth: TBaseQuery = async (
 export const baseApi = createApi({
   reducerPath: 'api',
   baseQuery: baseQueryWithReauth,
+  refetchOnFocus: true,
+  refetchOnReconnect: true,
+  refetchOnMountOrArgChange: REFETCH_AFTER_SECONDS,
   tagTypes: [
     'Session',
     'PaymentOccurrence',

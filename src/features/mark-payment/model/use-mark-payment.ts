@@ -7,25 +7,28 @@ import { runWithToast } from '@/shared/api'
 export function useMarkPayment(occurrence: IPaymentOccurrence) {
   const [update, { isLoading }] = useUpdatePaymentOccurrenceMutation()
 
-  function submit(paymentDate: string | null, successMessage: string) {
+  function markPaid(paymentDate: string) {
+    return runWithToast(
+      () => update({ id: occurrence.id, isPaid: true, paymentDate }).unwrap(),
+      {
+        successMessage: occurrence.isPaid
+          ? 'Дата оплаты изменена'
+          : 'Оплата отмечена',
+      },
+    )
+  }
+
+  function cancel() {
     return runWithToast(
       () =>
         update({
           id: occurrence.id,
-          isPaid: paymentDate !== null,
-          paymentDate,
+          isPaid: false,
+          paymentDate: null,
         }).unwrap(),
-      { successMessage },
+      { successMessage: 'Оплата отменена' },
     )
   }
 
-  return {
-    savePayment: (paymentDate: string) =>
-      submit(
-        paymentDate,
-        occurrence.isPaid ? 'Дата оплаты изменена' : 'Оплата отмечена',
-      ),
-    cancelPayment: () => submit(null, 'Оплата отменена'),
-    isLoading,
-  }
+  return { markPaid, cancel, isLoading }
 }

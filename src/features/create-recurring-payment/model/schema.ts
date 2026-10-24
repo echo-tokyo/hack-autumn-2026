@@ -8,8 +8,8 @@ export const recurringPaymentSchema = z.object({
     .trim()
     .min(1, 'Введите название')
     .max(255, 'Не больше 255 символов'),
-  amount: z
-    .number({ message: 'Укажите сумму' })
+  amount: z.coerce
+    .number<number | string>({ message: 'Укажите сумму' })
     .positive('Сумма должна быть больше нуля'),
   currency: z.enum(CURRENCIES),
   period: z.literal('monthly'),
@@ -18,4 +18,5 @@ export const recurringPaymentSchema = z.object({
     .min(1, 'Укажите дату ближайшей оплаты'),
 })
 
-export type TRecurringPaymentSchema = z.infer<typeof recurringPaymentSchema>
+export type TRecurringPaymentInput = z.input<typeof recurringPaymentSchema>
+export type TRecurringPaymentSchema = z.output<typeof recurringPaymentSchema>

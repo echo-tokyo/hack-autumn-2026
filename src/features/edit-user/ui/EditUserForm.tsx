@@ -3,13 +3,17 @@ import { Button, PasswordInput, Stack, TextInput } from '@mantine/core'
 import { Controller, useForm } from 'react-hook-form'
 import { z } from 'zod'
 
-import { type IUser, passwordField, usernameField } from '@/entities/user'
+import {
+  type IUser,
+  optionalPasswordField,
+  usernameField,
+} from '@/entities/user'
 
 import { useEditUser } from '../model/use-edit-user'
 
 const editUserSchema = z.object({
   username: usernameField,
-  password: z.union([z.literal(''), passwordField]),
+  password: optionalPasswordField,
 })
 
 type TEditUserSchema = z.infer<typeof editUserSchema>

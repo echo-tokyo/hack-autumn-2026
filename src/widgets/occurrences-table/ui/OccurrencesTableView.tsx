@@ -12,12 +12,10 @@ const TABLE_MIN_HEIGHT = 200
 
 interface IOccurrencesTableViewProps {
   occurrences: IPaymentOccurrence[]
-  today: string
 }
 
 export function OccurrencesTableView({
   occurrences,
-  today,
 }: IOccurrencesTableViewProps) {
   return (
     <Table.ScrollContainer minWidth={TABLE_MIN_WIDTH} mih={TABLE_MIN_HEIGHT}>
@@ -40,7 +38,7 @@ export function OccurrencesTableView({
         </Table.Thead>
         <Table.Tbody>
           {occurrences.map((occurrence) => {
-            const status = getOccurrenceStatus(occurrence, today)
+            const status = getOccurrenceStatus(occurrence.status)
 
             return (
               <Table.Tr key={occurrence.id}>
@@ -61,7 +59,9 @@ export function OccurrencesTableView({
                     : '-'}
                 </Table.Td>
                 <Table.Td ta='right'>
-                  {status.overdueDays > 0 ? `${status.overdueDays} дн.` : '-'}
+                  {occurrence.overdueDays > 0
+                    ? `${occurrence.overdueDays} дн.`
+                    : '-'}
                 </Table.Td>
                 <Table.Td>
                   <MarkPaymentButton occurrence={occurrence} />
