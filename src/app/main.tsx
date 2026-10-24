@@ -2,9 +2,11 @@ import '@/app/styles/index.css'
 
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import { Provider } from 'react-redux'
 import { RouterProvider } from 'react-router/dom'
 
 import { router } from './routes/Router'
+import { store } from './store/store'
 
 const rootElement = document.getElementById('root')
 
@@ -14,6 +16,8 @@ if (!rootElement) {
 
 createRoot(rootElement).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <Provider store={store}>
+      <RouterProvider router={router} />
+    </Provider>
   </StrictMode>,
 )
