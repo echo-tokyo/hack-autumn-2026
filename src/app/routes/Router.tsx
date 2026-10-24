@@ -4,6 +4,7 @@ import { LoginPage } from '@/pages/login'
 import { NotFoundPage } from '@/pages/not-found'
 import { OccurrencesPage } from '@/pages/occurrences'
 import { PaymentsPage } from '@/pages/payments'
+import { RecurringPaymentsPage } from '@/pages/recurring-payments'
 import { ROUTES } from '@/shared/config'
 
 import { AppLayout } from '../layouts/AppLayout'
@@ -23,6 +24,10 @@ export const router = createBrowserRouter([
             children: [
               { path: ROUTES.payments, Component: PaymentsPage },
               { path: ROUTES.occurrences, Component: OccurrencesPage },
+              {
+                path: ROUTES.recurringPayments,
+                Component: RecurringPaymentsPage,
+              },
               { path: '*', Component: NotFoundPage },
             ],
           },

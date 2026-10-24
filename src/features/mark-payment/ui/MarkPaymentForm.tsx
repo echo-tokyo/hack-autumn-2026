@@ -40,6 +40,7 @@ export function MarkPaymentForm({ occurrence, onDone }: IMarkPaymentFormProps) {
 
       <DatePickerInput
         label='Фактическая дата оплаты'
+        withAsterisk
         value={paymentDate}
         onChange={setPaymentDate}
         maxDate={today}

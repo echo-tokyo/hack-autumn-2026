@@ -74,6 +74,11 @@ const baseQueryWithReauth: TBaseQuery = async (
 export const baseApi = createApi({
   reducerPath: 'api',
   baseQuery: baseQueryWithReauth,
-  tagTypes: ['Session', 'PaymentOccurrence', 'PaymentsSummary'],
+  tagTypes: [
+    'Session',
+    'PaymentOccurrence',
+    'PaymentsSummary',
+    'RecurringPayment',
+  ],
   endpoints: () => ({}),
 })

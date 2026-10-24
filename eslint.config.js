@@ -69,6 +69,7 @@ export default defineConfig([
       ],
       'react/jsx-key': 'warn',
       'react/prop-types': 'off',
+      'react/no-unescaped-entities': 'off',
     },
   },
   prettierConfig,

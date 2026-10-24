@@ -13,7 +13,8 @@ import { useOccurrencesTable } from '../model/use-occurrences-table'
 import { OccurrencesFilters } from './OccurrencesFilters'
 import { OccurrencesTableView } from './OccurrencesTableView'
 
-const SKELETON_HEIGHT = 300
+const SKELETON_ROWS = 6
+const SKELETON_ROW_HEIGHT = 36
 
 export function OccurrencesTable() {
   const {
@@ -43,7 +44,10 @@ export function OccurrencesTable() {
           loaderProps={{ size: 'sm' }}
         />
 
-        {isLoading && <Skeleton h={SKELETON_HEIGHT} my='sm' />}
+        {isLoading &&
+          Array.from({ length: SKELETON_ROWS }, (_, index) => (
+            <Skeleton key={index} h={SKELETON_ROW_HEIGHT} my='sm' />
+          ))}
 
         {!isLoading && occurrences.length === 0 && (
           <Stack gap='sm' align='flex-start' py='sm'>

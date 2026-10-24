@@ -13,7 +13,8 @@ import {
 } from '../model/group-occurrences'
 import { GroupMessage, OccurrenceGroup } from './OccurrenceGroup'
 
-const SKELETON_ROWS = 3
+const SKELETON_ROWS = 6
+const SKELETON_ROW_HEIGHT = 56
 
 interface IOccurrenceGroupsProps {
   keys: TOccurrenceGroupKey[]
@@ -27,7 +28,7 @@ export function OccurrenceGroups({ keys }: IOccurrenceGroupsProps) {
     return (
       <OccurrenceGroup title='Платежи'>
         {Array.from({ length: SKELETON_ROWS }, (_, index) => (
-          <Skeleton key={index} h={80} my='sm' />
+          <Skeleton key={index} h={SKELETON_ROW_HEIGHT} my='sm' />
         ))}
       </OccurrenceGroup>
     )

@@ -81,6 +81,7 @@ export const theme = createTheme({
     TextInput: { defaultProps: { size: 'md' } },
     PasswordInput: { defaultProps: { size: 'md' } },
     Select: { defaultProps: { size: 'md' } },
+    NumberInput: { defaultProps: { size: 'md' } },
     DatePickerInput: { defaultProps: { size: 'md' } },
     InputWrapper: {
       styles: {
@@ -108,6 +109,7 @@ export const theme = createTheme({
         padding: 'lg',
         centered: true,
         overlayProps: { backgroundOpacity: 0.75 },
+        transitionProps: { transition: 'slide-up', duration: 250 },
       },
       styles: {
         content: { backgroundColor: 'var(--color-surface-2)' },

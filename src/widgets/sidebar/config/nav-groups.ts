@@ -2,6 +2,7 @@ import {
   type Icon,
   IconCalendarFilled,
   IconListDetailsFilled,
+  IconReceiptFilled,
 } from '@tabler/icons-react'
 
 import { ROUTES } from '@/shared/config'
@@ -28,6 +29,17 @@ export const NAV_GROUPS: INavGroup[] = [
         label: 'Периоды оплат',
         to: ROUTES.occurrences,
         icon: IconListDetailsFilled,
+      },
+    ],
+  },
+  {
+    label: 'Администрирование',
+    adminOnly: true,
+    items: [
+      {
+        label: 'Регулярные платежи',
+        to: ROUTES.recurringPayments,
+        icon: IconReceiptFilled,
       },
     ],
   },

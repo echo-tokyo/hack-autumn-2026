@@ -3,6 +3,7 @@ import {
   Button,
   Group,
   Paper,
+  SimpleGrid,
   Skeleton,
   Stack,
   Text,
@@ -16,7 +17,8 @@ import {
   useGetPaymentsSummaryQuery,
 } from '@/entities/payment-summary'
 
-const SKELETON_HEIGHT = 80
+const SKELETON_COUNT = 3
+const SKELETON_HEIGHT = 72
 const HINT = 'Суммы считаются отдельно по каждой валюте, без конвертации'
 
 export function PaymentsSummary() {
@@ -33,7 +35,13 @@ export function PaymentsSummary() {
         </Tooltip>
       </Group>
       <Paper bg='var(--color-surface-2)' radius='lg' p='md'>
-        {isLoading && <Skeleton h={SKELETON_HEIGHT} />}
+        {isLoading && (
+          <SimpleGrid cols={{ base: 1, md: SKELETON_COUNT }} spacing='xl'>
+            {Array.from({ length: SKELETON_COUNT }, (_, index) => (
+              <Skeleton key={index} h={SKELETON_HEIGHT} />
+            ))}
+          </SimpleGrid>
+        )}
 
         {!isLoading && (isError || !data) && (
           <Stack gap='sm' align='flex-start'>

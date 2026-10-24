@@ -30,6 +30,7 @@ export function LoginForm() {
           render={({ field, fieldState }) => (
             <TextInput
               label='Логин'
+              withAsterisk
               placeholder='Введите логин'
               autoComplete='username'
               error={fieldState.error?.message}
@@ -43,6 +44,7 @@ export function LoginForm() {
           render={({ field, fieldState }) => (
             <PasswordInput
               label='Пароль'
+              withAsterisk
               placeholder='Введите пароль'
               autoComplete='current-password'
               error={fieldState.error?.message}
