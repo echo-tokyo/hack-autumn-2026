@@ -1,0 +1,469 @@
+{
+    "consumes": [
+        "application/json"
+    ],
+    "produces": [
+        "application/json"
+    ],
+    "schemes": [
+        "http"
+    ],
+    "swagger": "2.0",
+    "info": {
+        "description": "HTTP API Invoice Keeper (напоминания о регулярных платежах).",
+        "title": "Invoice Keeper API",
+        "contact": {},
+        "version": "1.0.0"
+    },
+    "host": "127.0.0.1:8080",
+    "basePath": "/api/v1",
+    "paths": {
+        "/auth/login": {
+            "post": {
+                "description": "Вход для существующего юзера по логину и паролю.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Вход для юзера.",
+                "operationId": "auth-login",
+                "parameters": [
+                    {
+                        "description": "authBody",
+                        "name": "authBody",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.authBody"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.User"
+                        }
+                    },
+                    "400": {
+                        "description": "неверный логин или пароль"
+                    }
+                }
+            }
+        },
+        "/auth/logout": {
+            "post": {
+                "security": [
+                    {
+                        "JWTRefresh": []
+                    }
+                ],
+                "description": "Выход юзера (помещение refresh токена юзера в черный список).",
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Выход юзера.",
+                "operationId": "auth-logout",
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "401": {
+                        "description": "неверный токен (пустой, истекший или неверный формат)"
+                    },
+                    "403": {
+                        "description": "токен в черном списке"
+                    }
+                }
+            }
+        },
+        "/auth/me": {
+            "get": {
+                "security": [
+                    {
+                        "JWTAccess": []
+                    }
+                ],
+                "description": "Получение всей информации о себе (юзер, профиль).",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Получение информации о себе.",
+                "operationId": "auth-me-get",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.User"
+                        }
+                    },
+                    "401": {
+                        "description": "неверный токен (пустой, истекший или неверный формат)"
+                    }
+                }
+            }
+        },
+        "/auth/obtain": {
+            "post": {
+                "security": [
+                    {
+                        "JWTRefresh": []
+                    }
+                ],
+                "description": "Получение нового access токена по данному refresh токену из cookie.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Получение access токена.",
+                "operationId": "auth-obtain",
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "401": {
+                        "description": "неверный токен (пустой, истекший или неверный формат)"
+                    },
+                    "403": {
+                        "description": "токен в черном списке"
+                    }
+                }
+            }
+        },
+        "/users": {
+            "get": {
+                "security": [
+                    {
+                        "JWTAccess": []
+                    }
+                ],
+                "description": "Получение списка юзеров со всеми данными.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Получение списка юзеров. [Только админ]",
+                "operationId": "users-list",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.User"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "неверный токен (пустой, истекший или неверный формат)"
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "JWTAccess": []
+                    }
+                ],
+                "description": "Создание нового юзера и профиля для него со всеми данными.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Создание нового юзера. [Только админ]",
+                "operationId": "users-create",
+                "parameters": [
+                    {
+                        "description": "userBody",
+                        "name": "userBody",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.userBody"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/entity.User"
+                        }
+                    },
+                    "400": {
+                        "description": "слабый пароль"
+                    },
+                    "401": {
+                        "description": "неверный токен (пустой, истекший или неверный формат)"
+                    },
+                    "409": {
+                        "description": "пользователь с введенным логином уже существует"
+                    }
+                }
+            }
+        },
+        "/users/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "JWTAccess": []
+                    }
+                ],
+                "description": "Получение юзера со всеми данными по его id.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Получение юзера по id. [Только админ]",
+                "operationId": "users-read",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID юзера",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.User"
+                        }
+                    },
+                    "401": {
+                        "description": "неверный токен (пустой, истекший или неверный формат)"
+                    },
+                    "404": {
+                        "description": "пользователь не найден"
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "JWTAccess": []
+                    }
+                ],
+                "description": "Удаление юзера по его id.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Удаление юзера по id. [Только админ]",
+                "operationId": "users-delete",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID юзера",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "401": {
+                        "description": "неверный токен (пустой, истекший или неверный формат)"
+                    },
+                    "404": {
+                        "description": "пользователь не найден"
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "JWTAccess": []
+                    }
+                ],
+                "description": "Полное обновление профиля юзера, его группы (если студент) и пароля (опционально) по его id.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Обновление юзера по id. [Только админ]",
+                "operationId": "users-update",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID юзера",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "updateBody",
+                        "name": "updateBody",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.updateBody"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.User"
+                        }
+                    },
+                    "400": {
+                        "description": "слабый пароль"
+                    },
+                    "401": {
+                        "description": "неверный токен (пустой, истекший или неверный формат)"
+                    },
+                    "404": {
+                        "description": "пользователь не найден"
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "entity.User": {
+            "type": "object",
+            "required": [
+                "id",
+                "is_admin",
+                "username"
+            ],
+            "properties": {
+                "id": {
+                    "description": "user id",
+                    "type": "integer"
+                },
+                "is_admin": {
+                    "description": "true if user is admin",
+                    "type": "boolean"
+                },
+                "username": {
+                    "description": "user username",
+                    "type": "string"
+                }
+            }
+        },
+        "v1.authBody": {
+            "description": "authBody represents a data for user auth (log in).",
+            "type": "object",
+            "required": [
+                "password",
+                "username"
+            ],
+            "properties": {
+                "password": {
+                    "description": "user password",
+                    "type": "string",
+                    "maxLength": 40,
+                    "minLength": 8,
+                    "example": "Qwerty123!"
+                },
+                "username": {
+                    "description": "user login",
+                    "type": "string",
+                    "maxLength": 50,
+                    "example": "user1"
+                }
+            }
+        },
+        "v1.updateBody": {
+            "description": "updateBody represents a data to update user and profile.",
+            "type": "object",
+            "properties": {
+                "password": {
+                    "description": "user password",
+                    "type": "string",
+                    "maxLength": 40,
+                    "minLength": 8,
+                    "example": "Qwerty123!"
+                },
+                "username": {
+                    "description": "user username",
+                    "type": "string",
+                    "maxLength": 50,
+                    "example": "user1"
+                }
+            }
+        },
+        "v1.userBody": {
+            "description": "userBody represents a data with user.",
+            "type": "object",
+            "required": [
+                "password",
+                "username"
+            ],
+            "properties": {
+                "password": {
+                    "description": "user password",
+                    "type": "string",
+                    "maxLength": 40,
+                    "minLength": 8,
+                    "example": "Qwerty123!"
+                },
+                "username": {
+                    "description": "user username",
+                    "type": "string",
+                    "maxLength": 50,
+                    "example": "user1"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "JWTAccess": {
+            "description": "Access JWT-token. Cookie will automatic add after auth is done.",
+            "type": "apiKey",
+            "name": "access",
+            "in": "cookie"
+        },
+        "JWTRefresh": {
+            "description": "Refresh JWT-token. Cookie will automatic add after auth is done.",
+            "type": "apiKey",
+            "name": "refresh",
+            "in": "cookie"
+        }
+    }
+}

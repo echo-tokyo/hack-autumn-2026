@@ -1,0 +1,314 @@
+basePath: /api/v1
+consumes:
+- application/json
+definitions:
+  entity.User:
+    properties:
+      id:
+        description: user id
+        type: integer
+      is_admin:
+        description: true if user is admin
+        type: boolean
+      username:
+        description: user username
+        type: string
+    required:
+    - id
+    - is_admin
+    - username
+    type: object
+  v1.authBody:
+    description: authBody represents a data for user auth (log in).
+    properties:
+      password:
+        description: user password
+        example: Qwerty123!
+        maxLength: 40
+        minLength: 8
+        type: string
+      username:
+        description: user login
+        example: user1
+        maxLength: 50
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  v1.updateBody:
+    description: updateBody represents a data to update user and profile.
+    properties:
+      password:
+        description: user password
+        example: Qwerty123!
+        maxLength: 40
+        minLength: 8
+        type: string
+      username:
+        description: user username
+        example: user1
+        maxLength: 50
+        type: string
+    type: object
+  v1.userBody:
+    description: userBody represents a data with user.
+    properties:
+      password:
+        description: user password
+        example: Qwerty123!
+        maxLength: 40
+        minLength: 8
+        type: string
+      username:
+        description: user username
+        example: user1
+        maxLength: 50
+        type: string
+    required:
+    - password
+    - username
+    type: object
+host: 127.0.0.1:8080
+info:
+  contact: {}
+  description: HTTP API Invoice Keeper (напоминания о регулярных платежах).
+  title: Invoice Keeper API
+  version: 1.0.0
+paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Вход для существующего юзера по логину и паролю.
+      operationId: auth-login
+      parameters:
+      - description: authBody
+        in: body
+        name: authBody
+        required: true
+        schema:
+          $ref: '#/definitions/v1.authBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.User'
+        "400":
+          description: неверный логин или пароль
+      summary: Вход для юзера.
+      tags:
+      - auth
+  /auth/logout:
+    post:
+      description: Выход юзера (помещение refresh токена юзера в черный список).
+      operationId: auth-logout
+      responses:
+        "204":
+          description: No Content
+        "401":
+          description: неверный токен (пустой, истекший или неверный формат)
+        "403":
+          description: токен в черном списке
+      security:
+      - JWTRefresh: []
+      summary: Выход юзера.
+      tags:
+      - auth
+  /auth/me:
+    get:
+      consumes:
+      - application/json
+      description: Получение всей информации о себе (юзер, профиль).
+      operationId: auth-me-get
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.User'
+        "401":
+          description: неверный токен (пустой, истекший или неверный формат)
+      security:
+      - JWTAccess: []
+      summary: Получение информации о себе.
+      tags:
+      - auth
+  /auth/obtain:
+    post:
+      description: Получение нового access токена по данному refresh токену из cookie.
+      operationId: auth-obtain
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "401":
+          description: неверный токен (пустой, истекший или неверный формат)
+        "403":
+          description: токен в черном списке
+      security:
+      - JWTRefresh: []
+      summary: Получение access токена.
+      tags:
+      - auth
+  /users:
+    get:
+      consumes:
+      - application/json
+      description: Получение списка юзеров со всеми данными.
+      operationId: users-list
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.User'
+            type: array
+        "401":
+          description: неверный токен (пустой, истекший или неверный формат)
+      security:
+      - JWTAccess: []
+      summary: Получение списка юзеров. [Только админ]
+      tags:
+      - users
+    post:
+      consumes:
+      - application/json
+      description: Создание нового юзера и профиля для него со всеми данными.
+      operationId: users-create
+      parameters:
+      - description: userBody
+        in: body
+        name: userBody
+        required: true
+        schema:
+          $ref: '#/definitions/v1.userBody'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/entity.User'
+        "400":
+          description: слабый пароль
+        "401":
+          description: неверный токен (пустой, истекший или неверный формат)
+        "409":
+          description: пользователь с введенным логином уже существует
+      security:
+      - JWTAccess: []
+      summary: Создание нового юзера. [Только админ]
+      tags:
+      - users
+  /users/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Удаление юзера по его id.
+      operationId: users-delete
+      parameters:
+      - description: ID юзера
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "401":
+          description: неверный токен (пустой, истекший или неверный формат)
+        "404":
+          description: пользователь не найден
+      security:
+      - JWTAccess: []
+      summary: Удаление юзера по id. [Только админ]
+      tags:
+      - users
+    get:
+      consumes:
+      - application/json
+      description: Получение юзера со всеми данными по его id.
+      operationId: users-read
+      parameters:
+      - description: ID юзера
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.User'
+        "401":
+          description: неверный токен (пустой, истекший или неверный формат)
+        "404":
+          description: пользователь не найден
+      security:
+      - JWTAccess: []
+      summary: Получение юзера по id. [Только админ]
+      tags:
+      - users
+    patch:
+      consumes:
+      - application/json
+      description: Полное обновление профиля юзера, его группы (если студент) и пароля
+        (опционально) по его id.
+      operationId: users-update
+      parameters:
+      - description: ID юзера
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: updateBody
+        in: body
+        name: updateBody
+        required: true
+        schema:
+          $ref: '#/definitions/v1.updateBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.User'
+        "400":
+          description: слабый пароль
+        "401":
+          description: неверный токен (пустой, истекший или неверный формат)
+        "404":
+          description: пользователь не найден
+      security:
+      - JWTAccess: []
+      summary: Обновление юзера по id. [Только админ]
+      tags:
+      - users
+produces:
+- application/json
+schemes:
+- http
+securityDefinitions:
+  JWTAccess:
+    description: Access JWT-token. Cookie will automatic add after auth is done.
+    in: cookie
+    name: access
+    type: apiKey
+  JWTRefresh:
+    description: Refresh JWT-token. Cookie will automatic add after auth is done.
+    in: cookie
+    name: refresh
+    type: apiKey
+swagger: "2.0"

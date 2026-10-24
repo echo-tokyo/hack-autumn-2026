@@ -1,0 +1,32 @@
+db:
+  host: "127.0.0.1" # db host
+  port: 5432 # db port
+  logging:
+    log_level: 2 # 2 - info, 3 - warn (default), 4 - error, 5 - silent
+
+app:
+  logging:
+    log_level: 1 # 1 - debug, 2 - info (default), 3 - warn, 4 - error, 5 - silent
+    log_format: "json" # ("json", "text") set log format
+  server:
+    port: 8080 # port for HTTP-server
+    shutdown_timeout: 1s # timeout to force shutdown server after receiving an OS signal
+    cors:
+      allowed_origins: "http://127.0.0.1,http://172.17.0.1,http://web-server" # comma-separated allowed origins for cors
+      allowed_methods: "GET,HEAD,POST,PATCH,DELETE,OPTIONS" # comma-separated allowed methods for cors
+      allow_credentials: true # allow credentials for cors if true
+    auth:
+      access_token:
+        ttl: 30m # access JWT-token expiration duration
+        cookie:
+          path: "/" # cookie path
+          secure: true # enable cookie secure if true
+          http_only: true # enable cookie HTTP-only if true
+          same_site: "Lax" # cookie same site mode ("None", "Strict" or "Lax")
+      refresh_token:
+        ttl: 24h # refresh JWT-token expiration duration
+        cookie:
+          path: "/api/v1/auth/" # cookie path
+          secure: true # enable cookie secure if true
+          http_only: true # enable cookie HTTP-only if true
+          same_site: "Lax" # cookie same site mode ("None", "Strict" or "Lax")
