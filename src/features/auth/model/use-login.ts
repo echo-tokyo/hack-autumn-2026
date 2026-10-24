@@ -29,7 +29,7 @@ export function useLogin() {
   async function login(values: ILoginRequest) {
     try {
       await loginMutation(values).unwrap()
-      navigate(getRedirectPath(location.state), { replace: true })
+      await navigate(getRedirectPath(location.state), { replace: true })
     } catch (error) {
       toast.error(getErrorMessage(error, LOGIN_ERROR_MESSAGES))
     }

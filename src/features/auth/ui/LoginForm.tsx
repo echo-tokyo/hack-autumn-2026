@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Button, PasswordInput, Stack, TextInput } from '@mantine/core'
 import { Controller, useForm } from 'react-hook-form'
 
 import { loginSchema, type TLoginSchema } from '../model/login-schema'
@@ -22,43 +23,45 @@ export function LoginForm() {
 
   return (
     <form onSubmit={handleSubmit(login)} noValidate>
-      <Controller
-        name='login'
-        control={control}
-        render={({ field, fieldState }) => (
-          <>
-            <label htmlFor='login'>Логин</label>
-            <input
-              id='login'
+      <Stack gap='xs'>
+        <Controller
+          name='login'
+          control={control}
+          render={({ field, fieldState }) => (
+            <TextInput
+              label='Логин'
+              placeholder='Введите логин'
+              size='lg'
               autoComplete='username'
-              aria-invalid={Boolean(fieldState.error)}
+              error={fieldState.error?.message}
               {...field}
             />
-            {fieldState.error && <p role='alert'>{fieldState.error.message}</p>}
-          </>
-        )}
-      />
-      <Controller
-        name='password'
-        control={control}
-        render={({ field, fieldState }) => (
-          <>
-            <label htmlFor='password'>Пароль</label>
-            <input
-              id='password'
-              type='password'
+          )}
+        />
+        <Controller
+          name='password'
+          control={control}
+          render={({ field, fieldState }) => (
+            <PasswordInput
+              label='Пароль'
+              placeholder='Введите пароль'
+              size='lg'
               autoComplete='current-password'
-              aria-invalid={Boolean(fieldState.error)}
+              error={fieldState.error?.message}
               {...field}
             />
-            {fieldState.error && <p role='alert'>{fieldState.error.message}</p>}
-          </>
-        )}
-      />
-
-      <button type='submit' disabled={!isDirty || isSubmitting}>
-        Войти
-      </button>
+          )}
+        />
+        <Button
+          type='submit'
+          size='lg'
+          fullWidth
+          disabled={!isDirty}
+          loading={isSubmitting}
+        >
+          войти
+        </Button>
+      </Stack>
     </form>
   )
 }

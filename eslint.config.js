@@ -63,13 +63,11 @@ export default defineConfig([
         { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
       ],
       '@typescript-eslint/no-explicit-any': 'warn',
-      // Allows onSubmit={handleSubmit(onSubmit)} from react-hook-form
       '@typescript-eslint/no-misused-promises': [
         'error',
         { checksVoidReturn: { attributes: false } },
       ],
       'react/jsx-key': 'warn',
-      // Props are typed with TypeScript
       'react/prop-types': 'off',
     },
   },

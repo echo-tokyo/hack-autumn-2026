@@ -1,10 +1,15 @@
+import '@fontsource-variable/onest'
+import '@mantine/core/styles.css'
 import '@/app/styles/index.css'
 
+import { MantineProvider } from '@mantine/core'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { Provider } from 'react-redux'
 import { RouterProvider } from 'react-router/dom'
 import { Toaster } from 'sonner'
+
+import { cssVariablesResolver, theme } from '@/shared/config'
 
 import { store } from './model/store'
 import { router } from './routes/Router'
@@ -27,9 +32,15 @@ await enableMocking()
 
 createRoot(rootElement).render(
   <StrictMode>
-    <Provider store={store}>
-      <RouterProvider router={router} />
-      <Toaster position='bottom-center' />
-    </Provider>
+    <MantineProvider
+      theme={theme}
+      cssVariablesResolver={cssVariablesResolver}
+      forceColorScheme='dark'
+    >
+      <Provider store={store}>
+        <RouterProvider router={router} />
+        <Toaster position='bottom-center' theme='dark' />
+      </Provider>
+    </MantineProvider>
   </StrictMode>,
 )

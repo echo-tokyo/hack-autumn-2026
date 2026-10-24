@@ -1,4 +1,3 @@
-// Mock backend keeps its own shapes, independent of frontend types
 export interface IMockUser {
   id: number
   login: string
