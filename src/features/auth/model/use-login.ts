@@ -1,11 +1,9 @@
 import { useLocation, useNavigate } from 'react-router'
 import { toast } from 'sonner'
 
-import { useLoginMutation } from '@/entities/user'
+import { type ILoginRequest, useLoginMutation } from '@/entities/user'
 import { getErrorMessage } from '@/shared/api'
 import { ROUTES } from '@/shared/config'
-
-import type { ILoginRequest } from './types'
 
 const LOGIN_ERROR_MESSAGES = { 401: 'Неверный логин или пароль' }
 

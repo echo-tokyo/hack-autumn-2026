@@ -5,6 +5,7 @@ export function Logo() {
     <Text
       component='span'
       display='block'
+      ff='heading'
       fw={800}
       fz='xl'
       lh={0.9}

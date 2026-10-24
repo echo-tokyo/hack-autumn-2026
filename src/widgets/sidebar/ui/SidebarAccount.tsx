@@ -10,7 +10,7 @@ export function SidebarAccount({ user }: ISidebarAccountProps) {
   return (
     <Paper bg='var(--color-surface-2)' radius='lg' p='md'>
       <Text fw={700} fz='lg'>
-        @{user.login}
+        @{user.username}
       </Text>
       <Text c='dimmed' fz='sm'>
         {USER_ROLE_LABELS[user.role]}

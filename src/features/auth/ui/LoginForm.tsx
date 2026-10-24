@@ -6,7 +6,7 @@ import { loginSchema, type TLoginSchema } from '../model/login-schema'
 import { useLogin } from '../model/use-login'
 
 const DEFAULT_VALUES = {
-  login: '',
+  username: '',
   password: '',
 } as const
 
@@ -25,7 +25,7 @@ export function LoginForm() {
     <form onSubmit={handleSubmit(login)} noValidate>
       <Stack gap='xs'>
         <Controller
-          name='login'
+          name='username'
           control={control}
           render={({ field, fieldState }) => (
             <TextInput

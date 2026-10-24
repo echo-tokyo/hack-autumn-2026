@@ -2,11 +2,11 @@ export type TUserRole = 'admin' | 'user'
 
 export interface IUser {
   id: number
-  login: string
+  username: string
   role: TUserRole
 }
 
 export interface ILoginRequest {
-  login: string
+  username: string
   password: string
 }

@@ -4,17 +4,17 @@ import {
   type MantineColorsTuple,
 } from '@mantine/core'
 
-const orange: MantineColorsTuple = [
-  '#fff3e6',
-  '#ffe3c7',
-  '#ffc48d',
-  '#ffa250',
-  '#ff8a22',
-  '#ff7f0d',
-  '#ff7a00',
-  '#e36a00',
-  '#ca5d00',
-  '#ad4e00',
+const brand: MantineColorsTuple = [
+  '#e6f8fe',
+  '#cdeffc',
+  '#9fe0f9',
+  '#6fd1f5',
+  '#5ccbf3',
+  '#53c8f2',
+  '#4cc6f1',
+  '#2fb3e2',
+  '#1b9fcd',
+  '#0789b4',
 ]
 
 const dark: MantineColorsTuple = [
@@ -33,14 +33,14 @@ const dark: MantineColorsTuple = [
 const OVERLAY_SHADOW = '0 8px 32px rgba(0, 0, 0, 0.6)'
 
 export const theme = createTheme({
-  colors: { orange, dark },
-  primaryColor: 'orange',
+  colors: { brand, dark },
+  primaryColor: 'brand',
   primaryShade: 6,
   autoContrast: true,
   respectReducedMotion: true,
-  fontFamily: "'Onest Variable', sans-serif",
+  fontFamily: "'Inter Variable', sans-serif",
   headings: {
-    fontFamily: "'Onest Variable', sans-serif",
+    fontFamily: "'Exo 2 Variable', sans-serif",
     fontWeight: '700',
     sizes: {
       h1: { fontSize: '2rem', lineHeight: '1.2' },
@@ -113,7 +113,7 @@ export const cssVariablesResolver: CSSVariablesResolver = () => ({
     '--color-border': '#2f2f2f',
     '--color-text-muted': '#666666',
     '--color-text-faint': '#424242',
-    '--color-accent': '#ff7a00',
+    '--color-accent': '#4cc6f1',
     '--color-success': '#2cc04d',
     '--color-danger': '#ff4d4d',
     '--color-button-disabled': '#a3a3a3',

@@ -1,18 +1,18 @@
 export interface IMockUser {
   id: number
-  login: string
+  username: string
   password: string
   role: 'admin' | 'user'
 }
 
 export const mockUsers: IMockUser[] = [
-  { id: 1, login: 'admin', password: 'admin', role: 'admin' },
-  { id: 2, login: 'buhgalter', password: 'buhgalter', role: 'user' },
-  { id: 3, login: 'manager', password: 'manager', role: 'user' },
+  { id: 1, username: 'admin', password: 'admin', role: 'admin' },
+  { id: 2, username: 'buhgalter', password: 'buhgalter', role: 'user' },
+  { id: 3, username: 'manager', password: 'manager', role: 'user' },
 ]
 
-export function toUserDto({ id, login, role }: IMockUser) {
-  return { id, login, role }
+export function toUserDto({ id, username, role }: IMockUser) {
+  return { id, username, role }
 }
 
 export function findUserById(id: string | undefined) {

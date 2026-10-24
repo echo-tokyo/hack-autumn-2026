@@ -12,7 +12,7 @@ import {
 } from '../session'
 
 interface ILoginBody {
-  login: string
+  username: string
   password: string
 }
 
@@ -21,9 +21,9 @@ export const authHandlers = [
     `${BASE_URL}/auth/login`,
     async ({ request }) => {
       await delay()
-      const { login, password } = await request.json()
+      const { username, password } = await request.json()
       const user = mockUsers.find(
-        (item) => item.login === login && item.password === password,
+        (item) => item.username === username && item.password === password,
       )
 
       if (!user) {

@@ -1,4 +1,4 @@
-import { type Icon, IconCalendarDue } from '@tabler/icons-react'
+import { type Icon, IconCalendarFilled } from '@tabler/icons-react'
 
 import { ROUTES } from '@/shared/config'
 
@@ -18,6 +18,6 @@ export const NAV_GROUPS: INavGroup[] = [
   {
     label: 'Платежи',
     adminOnly: false,
-    items: [{ label: 'Сводка', to: ROUTES.payments, icon: IconCalendarDue }],
+    items: [{ label: 'Сводка', to: ROUTES.payments, icon: IconCalendarFilled }],
   },
 ]

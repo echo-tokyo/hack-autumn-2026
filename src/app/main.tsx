@@ -1,4 +1,5 @@
-import '@fontsource-variable/onest'
+import '@fontsource-variable/exo-2'
+import '@fontsource-variable/inter/opsz.css'
 import '@mantine/core/styles.css'
 import '@/app/styles/index.css'
 
