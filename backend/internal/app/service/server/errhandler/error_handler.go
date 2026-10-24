@@ -24,13 +24,14 @@ func CustomErrorHandler(ctx *fiber.Ctx, err error) error {
 	// *fiber.Error error
 	case goerrors.As(err, &fiberErr):
 		errCode = fiberErr.Code
-		if fiberErr.Code == fiber.StatusNotFound {
-			errMsg = "страница не найдена"
+		switch fiberErr.Code {
+		case fiber.StatusNotFound:
+			errMsg = "запись не найдена"
 			errLog = false
-		} else if fiberErr.Code == fiber.StatusForbidden {
+		case fiber.StatusForbidden:
 			errMsg = "запрещено"
 			errLog = true
-		} else {
+		default:
 			errMsg = fiberErr.Message
 			errLog = true
 		}
