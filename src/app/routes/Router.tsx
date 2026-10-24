@@ -8,6 +8,7 @@ import { RecurringPaymentsPage } from '@/pages/recurring-payments'
 import { UsersPage } from '@/pages/users'
 import { ROUTES } from '@/shared/config'
 
+import { AdminRoute } from '../layouts/AdminRoute'
 import { AppLayout } from '../layouts/AppLayout'
 import { MainLayout } from '../layouts/MainLayout'
 import { ProtectedRoute } from '../layouts/ProtectedRoute'
@@ -26,10 +27,15 @@ export const router = createBrowserRouter([
               { path: ROUTES.payments, Component: PaymentsPage },
               { path: ROUTES.occurrences, Component: OccurrencesPage },
               {
-                path: ROUTES.recurringPayments,
-                Component: RecurringPaymentsPage,
+                Component: AdminRoute,
+                children: [
+                  {
+                    path: ROUTES.recurringPayments,
+                    Component: RecurringPaymentsPage,
+                  },
+                  { path: ROUTES.users, Component: UsersPage },
+                ],
               },
-              { path: ROUTES.users, Component: UsersPage },
               { path: '*', Component: NotFoundPage },
             ],
           },
