@@ -11,9 +11,9 @@ type RecurringPayment struct {
 	Name       string          `json:"name"`
 	Amount     decimal.Decimal `json:"amount"`
 	Currency   Currency        `json:"currency"`
-	BillingDay int32           `json:"billing_day"`
-	StartDate  time.Time       `json:"start_date"`
-	IsDeleted  bool            `json:"is_deleted"`
-	CreatedAt  time.Time       `json:"created_at"`
-	UpdatedAt  time.Time       `json:"updated_at"`
+	BillingDay int32           `json:"billingDay"`
+	StartDate  time.Time       `json:"startDate"`
+	IsDeleted  bool            `json:"isDeleted"`
+	CreatedAt  time.Time       `json:"createdAt"`
+	UpdatedAt  time.Time       `json:"updatedAt"`
 }

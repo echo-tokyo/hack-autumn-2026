@@ -29,7 +29,7 @@ CREATE TABLE payment_occurrences (
     is_paid BOOLEAN NOT NULL DEFAULT FALSE,
     payment_date DATE,
     is_notified BOOLEAN NOT NULL DEFAULT FALSE,
-    notified_at TIMESTAMP NOT NULL,
+    notified_at TIMESTAMP NULL,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
     UNIQUE (

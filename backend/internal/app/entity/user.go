@@ -12,7 +12,7 @@ type User struct {
 	// user password hash
 	Password []byte `json:"-"`
 	// true if user is admin
-	IsAdmin bool `gorm:"-" json:"is_admin" validate:"required"`
+	IsAdmin bool `gorm:"-" json:"isAdmin" validate:"required"`
 	// user creating datetime
 	CreatedAt time.Time `json:"-"`
 	// user updating datetime

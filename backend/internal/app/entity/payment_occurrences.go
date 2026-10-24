@@ -8,14 +8,15 @@ import (
 
 type PaymentOccurrence struct {
 	ID                 int32           `gorm:"primaryKey;autoIncrement" json:"id"`
-	RecurringPaymentID int32           `json:"recurring_payment_id"`
+	RecurringPaymentID int32           `json:"recurringPaymentId"`
 	Amount             decimal.Decimal `json:"amount"`
 	Currency           Currency        `json:"currency"`
-	DueDate            time.Time       `json:"due_date"`
-	IsPaid             bool            `json:"is_paid"`
-	PaymentDate        *time.Time      `json:"payment_date"`
-	IsNotified         bool            `json:"is_notified"`
-	NotifiedAt         *time.Time      `json:"notified_at"`
-	CreatedAt          time.Time       `json:"created_at"`
-	UpdatedAt          time.Time       `json:"updated_at"`
+	DueDate            time.Time       `json:"dueDate"`
+	IsPaid             bool            `json:"isPaid"`
+	PaymentDate        *time.Time      `json:"paymentDate"`
+	IsNotified         bool            `json:"isNotified"`
+	NotifiedAt         *time.Time      `json:"notifiedAt"`
+	CreatedAt          time.Time       `json:"createdAt"`
+	UpdatedAt          time.Time       `json:"updatedAt"`
+	IsOverdue          bool            `gorm:"-" json:"isOverdue"`
 }
