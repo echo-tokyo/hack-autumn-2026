@@ -78,6 +78,17 @@ definitions:
     - isAdmin
     - username
     type: object
+  paymentoccurrence.CurrencySummary:
+    properties:
+      currency:
+        $ref: '#/definitions/entity.Currency'
+      overdue:
+        type: number
+      paid:
+        type: number
+      toPay:
+        type: number
+    type: object
   v1.authBody:
     description: authBody represents a data for user auth (log in).
     properties:
@@ -391,18 +402,18 @@ paths:
       consumes:
       - application/json
       description: |-
-        Возвращает суммарные расходы по всем периодам, сгруппированные по валютам.
-        Конвертация не выполняется: суммы в RUB, USD и EUR считаются отдельно.
+        Суммарные расходы по каждой валюте в трёх бакетах: к оплате, просрочено, оплачено.
+        Бакеты не пересекаются и покрывают все периоды. Конвертация не выполняется.
       operationId: payments-summary
       produces:
       - application/json
       responses:
         "200":
-          description: суммы по валютам, ключи RUB, USD, EUR
+          description: 'всегда 3 элемента: RUB, USD, EUR'
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            items:
+              $ref: '#/definitions/paymentoccurrence.CurrencySummary'
+            type: array
         "401":
           description: неверный токен
         "500":

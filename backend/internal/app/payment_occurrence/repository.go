@@ -3,8 +3,6 @@ package paymentoccurrence
 import (
 	"time"
 
-	"github.com/shopspring/decimal"
-
 	"backend/internal/app/entity"
 )
 
@@ -51,10 +49,6 @@ type RepositoryDB interface {
 	Update(occ *entity.PaymentOccurrence) error
 
 	// ListToRemind returns occurrences that need a reminder:
-	//   - not paid
-	//   - not notified yet
-	//   - parent recurring payment is not soft-deleted
-	//   - due_date <= deadline
 	// Ordered by due_date ascending.
 	ListToRemind(deadline time.Time) ([]*entity.PaymentOccurrence, error)
 
@@ -64,7 +58,7 @@ type RepositoryDB interface {
 	MarkNotified(id int32, at time.Time) error
 
 	// Summary returns total amounts grouped by currency.
-	Summary() (map[entity.Currency]decimal.Decimal, error)
+	Summary(today time.Time) (map[entity.Currency]CurrencySummary, error)
 }
 
 // ListFilter represents optional filters for List.

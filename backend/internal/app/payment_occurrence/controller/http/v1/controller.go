@@ -5,12 +5,10 @@ package v1
 import (
 	"errors"
 	"fmt"
-	"maps"
 	"strconv"
 	"time"
 
 	fiber "github.com/gofiber/fiber/v2"
-	"github.com/shopspring/decimal"
 
 	"backend/internal/app/entity"
 	occurrence "backend/internal/app/payment_occurrence"
@@ -32,22 +30,22 @@ func NewController(uc occurrence.Usecase, valid validator.Validator) *PaymentOcc
 	}
 }
 
-//	@summary		Список периодов регулярных платежей.
-//	@description	Возвращает периоды с фильтрами по родительскому платежу, валюте и статусу.
-//	@description	Для каждого периода вычисляется is_overdue.
-//	@router			/payment-occurrences [get]
-//	@id				payment-occurrences-list
-//	@tags			payment-occurrences
-//	@accept			json
-//	@produce		json
-//	@security		JWTAccess
-//	@param			recurring_payment_id	query	int		false	"фильтр по id регулярного платежа"
-//	@param			currency				query	string	false	"фильтр по валюте"	Enums(RUB,USD,EUR)
-//	@param			status					query	string	false	"фильтр по статусу"	Enums(paid,unpaid,overdue)
-//	@success		200						{array}	entity.PaymentOccurrence
-//	@failure		400						"неверные параметры фильтрации"
-//	@failure		401						"неверный токен"
-//	@failure		500						"внутренняя ошибка"
+// @summary		Список периодов регулярных платежей.
+// @description	Возвращает периоды с фильтрами по родительскому платежу, валюте и статусу.
+// @description	Для каждого периода вычисляется is_overdue.
+// @router			/payment-occurrences [get]
+// @id				payment-occurrences-list
+// @tags			payment-occurrences
+// @accept			json
+// @produce		json
+// @security		JWTAccess
+// @param			recurring_payment_id	query	int		false	"фильтр по id регулярного платежа"
+// @param			currency				query	string	false	"фильтр по валюте"	Enums(RUB,USD,EUR)
+// @param			status					query	string	false	"фильтр по статусу"	Enums(paid,unpaid,overdue)
+// @success		200						{array}	entity.PaymentOccurrence
+// @failure		400						"неверные параметры фильтрации"
+// @failure		401						"неверный токен"
+// @failure		500						"внутренняя ошибка"
 func (c *PaymentOccurrenceController) List(ctx *fiber.Ctx) error {
 	filter := occurrence.ListFilter{}
 
@@ -93,20 +91,20 @@ func (c *PaymentOccurrenceController) List(ctx *fiber.Ctx) error {
 	return ctx.Status(fiber.StatusOK).JSON(occurrences)
 }
 
-//	@summary		Получить период регулярного платежа.
-//	@description	Возвращает конкретный период по id. Для периода вычисляется is_overdue.
-//	@router			/payment-occurrences/{id} [get]
-//	@id				payment-occurrences-get
-//	@tags			payment-occurrences
-//	@accept			json
-//	@produce		json
-//	@security		JWTAccess
-//	@param			id	path		int	true	"id периода"
-//	@success		200	{object}	entity.PaymentOccurrence
-//	@failure		400	"неверный id"
-//	@failure		401	"неверный токен"
-//	@failure		404	"период не найден"
-//	@failure		500	"внутренняя ошибка"
+// @summary		Получить период регулярного платежа.
+// @description	Возвращает конкретный период по id. Для периода вычисляется is_overdue.
+// @router			/payment-occurrences/{id} [get]
+// @id				payment-occurrences-get
+// @tags			payment-occurrences
+// @accept			json
+// @produce		json
+// @security		JWTAccess
+// @param			id	path		int	true	"id периода"
+// @success		200	{object}	entity.PaymentOccurrence
+// @failure		400	"неверный id"
+// @failure		401	"неверный токен"
+// @failure		404	"период не найден"
+// @failure		500	"внутренняя ошибка"
 func (c *PaymentOccurrenceController) GetByID(ctx *fiber.Ctx) error {
 	id, err := parseID(ctx.Params("id"))
 	if err != nil {
@@ -127,23 +125,23 @@ func (c *PaymentOccurrenceController) GetByID(ctx *fiber.Ctx) error {
 	return ctx.Status(fiber.StatusOK).JSON(occ)
 }
 
-//	@summary		Обновить оплату периода.
-//	@description	Подтверждение/отмена оплаты и исправление фактической даты оплаты.
-//	@description	Если is_paid=false — фактическая дата очищается.
-//	@description	Если дата в будущем — ошибка 400.
-//	@router			/payment-occurrences/{id} [patch]
-//	@id				payment-occurrences-update
-//	@tags			payment-occurrences
-//	@accept			json
-//	@produce		json
-//	@security		JWTAccess
-//	@param			id		path		int						true	"id периода"
-//	@param			request	body		updateOccurrenceBody	true	"изменения статуса и/или даты оплаты"
-//	@success		200		{object}	entity.PaymentOccurrence
-//	@failure		400		"неверное тело запроса или значения"
-//	@failure		401		"неверный токен"
-//	@failure		404		"период не найден"
-//	@failure		500		"внутренняя ошибка"
+// @summary		Обновить оплату периода.
+// @description	Подтверждение/отмена оплаты и исправление фактической даты оплаты.
+// @description	Если is_paid=false — фактическая дата очищается.
+// @description	Если дата в будущем — ошибка 400.
+// @router			/payment-occurrences/{id} [patch]
+// @id				payment-occurrences-update
+// @tags			payment-occurrences
+// @accept			json
+// @produce		json
+// @security		JWTAccess
+// @param			id		path		int						true	"id периода"
+// @param			request	body		updateOccurrenceBody	true	"изменения статуса и/или даты оплаты"
+// @success		200		{object}	entity.PaymentOccurrence
+// @failure		400		"неверное тело запроса или значения"
+// @failure		401		"неверный токен"
+// @failure		404		"период не найден"
+// @failure		500		"внутренняя ошибка"
 func (c *PaymentOccurrenceController) Update(ctx *fiber.Ctx) error {
 	id, err := parseID(ctx.Params("id"))
 	if err != nil {
@@ -183,35 +181,24 @@ func (c *PaymentOccurrenceController) Update(ctx *fiber.Ctx) error {
 	return ctx.Status(fiber.StatusOK).JSON(occ)
 }
 
-//	@summary		Итоговые суммы по валютам.
-//	@description	Возвращает суммарные расходы по всем периодам, сгруппированные по валютам.
-//	@description	Конвертация не выполняется: суммы в RUB, USD и EUR считаются отдельно.
-//	@router			/payments/summary [get]
-//	@id				payments-summary
-//	@tags			payments
-//	@accept			json
-//	@produce		json
-//	@security		JWTAccess
-//	@success		200	{object}	map[string]string	"суммы по валютам, ключи RUB, USD, EUR"
-//	@failure		401	"неверный токен"
-//	@failure		500	"внутренняя ошибка"
+// @summary		Итоговые суммы по валютам.
+// @description	Суммарные расходы по каждой валюте в трёх бакетах: к оплате, просрочено, оплачено.
+// @description	Бакеты не пересекаются и покрывают все периоды. Конвертация не выполняется.
+// @router			/payments/summary [get]
+// @id				payments-summary
+// @tags			payments
+// @accept			json
+// @produce		json
+// @security		JWTAccess
+// @success		200	{array}	occurrence.CurrencySummary	"всегда 3 элемента: RUB, USD, EUR"
+// @failure		401	"неверный токен"
+// @failure		500	"внутренняя ошибка"
 func (c *PaymentOccurrenceController) Summary(ctx *fiber.Ctx) error {
 	summary, err := c.uc.Summary()
 	if err != nil {
 		return fmt.Errorf("summary: %w", err)
 	}
-
-	// Normalize: always return all three currencies, even if no payments.
-	// Otherwise frontend gets {"RUB": "..."} without USD/EUR keys on empty DB
-	// and may render undefined values.
-	result := map[entity.Currency]decimal.Decimal{
-		entity.CurrencyRUB: decimal.Zero,
-		entity.CurrencyUSD: decimal.Zero,
-		entity.CurrencyEUR: decimal.Zero,
-	}
-	maps.Copy(result, summary)
-
-	return ctx.Status(fiber.StatusOK).JSON(result)
+	return ctx.Status(fiber.StatusOK).JSON(summary)
 }
 
 // parseID parses a positive int32 from string.

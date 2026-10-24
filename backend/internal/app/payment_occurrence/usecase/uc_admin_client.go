@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/shopspring/decimal"
-
 	"backend/config"
 	"backend/internal/app/entity"
 	occurrence "backend/internal/app/payment_occurrence"
@@ -132,13 +130,32 @@ func (u *UC) Update(id int32, input occurrence.UpdateInput) (*entity.PaymentOccu
 	return occ, nil
 }
 
-// Summary returns total amounts grouped by currency.
-func (u *UC) Summary() (map[entity.Currency]decimal.Decimal, error) {
-	summary, err := u.repo.Summary()
+func (u *UC) Summary() ([]occurrence.CurrencySummary, error) {
+	today, err := u.today()
+	if err != nil {
+		return nil, fmt.Errorf("resolve today: %w", err)
+	}
+
+	raw, err := u.repo.Summary(today)
 	if err != nil {
 		return nil, fmt.Errorf("summary: %w", err)
 	}
-	return summary, nil
+
+	// Always return all three currencies, even if there are no rows for
+	// some of them. The frontend can render a stable 3-row table without
+	// null-checks. Zero-value decimal.Decimal equals 0.
+	result := []occurrence.CurrencySummary{
+		{Currency: entity.CurrencyRUB},
+		{Currency: entity.CurrencyUSD},
+		{Currency: entity.CurrencyEUR},
+	}
+	for i, cs := range result {
+		if got, ok := raw[cs.Currency]; ok {
+			result[i] = got
+		}
+	}
+
+	return result, nil
 }
 
 // today returns current date (00:00:00) in configured timezone.

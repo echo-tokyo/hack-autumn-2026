@@ -212,25 +212,50 @@ func (r *RepoDB) MarkNotified(id int32, at time.Time) error {
 }
 
 // Summary returns total amounts grouped by currency.
-func (r *RepoDB) Summary() (map[entity.Currency]decimal.Decimal, error) {
-	var rows []struct {
+func (r *RepoDB) Summary(today time.Time) (map[entity.Currency]occurrence.CurrencySummary, error) {
+	type row struct {
 		Currency entity.Currency
-		Total    decimal.Decimal
+		ToPay    decimal.Decimal
+		Overdue  decimal.Decimal
+		Paid     decimal.Decimal
 	}
+
+	var rows []row
+	todayStr := today.Format("2006-01-02")
 
 	err := r.dbStorage.
 		Model(&entity.PaymentOccurrence{}).
-		Select("currency, COALESCE(SUM(amount), 0) AS total").
-		Group("currency").
+		Select(`
+			payment_occurrences.currency AS currency,
+			COALESCE(SUM(CASE
+				WHEN payment_occurrences.is_paid = false
+				 AND payment_occurrences.due_date >= ?
+				THEN payment_occurrences.amount ELSE 0 END), 0) AS to_pay,
+			COALESCE(SUM(CASE
+				WHEN payment_occurrences.is_paid = false
+				 AND payment_occurrences.due_date <  ?
+				THEN payment_occurrences.amount ELSE 0 END), 0) AS overdue,
+			COALESCE(SUM(CASE
+				WHEN payment_occurrences.is_paid = true
+				THEN payment_occurrences.amount ELSE 0 END), 0) AS paid
+		`, todayStr, todayStr).
+		Joins("JOIN recurring_payments ON recurring_payments.id = payment_occurrences.recurring_payment_id").
+		Where("recurring_payments.is_deleted = ?", false).
+		Group("payment_occurrences.currency").
 		Scan(&rows).Error
 
 	if err != nil {
 		return nil, fmt.Errorf("summary: %w", err)
 	}
 
-	result := make(map[entity.Currency]decimal.Decimal, len(rows))
-	for _, row := range rows {
-		result[row.Currency] = row.Total
+	result := make(map[entity.Currency]occurrence.CurrencySummary, len(rows))
+	for _, r := range rows {
+		result[r.Currency] = occurrence.CurrencySummary{
+			Currency: r.Currency,
+			ToPay:    r.ToPay,
+			Overdue:  r.Overdue,
+			Paid:     r.Paid,
+		}
 	}
 	return result, nil
 }

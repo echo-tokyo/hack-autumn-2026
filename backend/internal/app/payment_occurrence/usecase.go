@@ -9,20 +9,19 @@ import (
 )
 
 // UpdateInput represents changes to apply to a payment occurrence.
-//
-// Rules:
-//   - IsPaid=false            → unmark, PaymentDate cleared.
-//   - IsPaid=true, date=nil   → mark paid today.
-//   - IsPaid=true, date=given → mark paid on given date.
-//   - IsPaid=nil, date=given  → fix date of already paid occurrence.
 type UpdateInput struct {
 	IsPaid      *bool
 	PaymentDate *time.Time
 }
 
+type CurrencySummary struct {
+	Currency entity.Currency `json:"currency"`
+	ToPay    decimal.Decimal `json:"toPay"`
+	Overdue  decimal.Decimal `json:"overdue"`
+	Paid     decimal.Decimal `json:"paid"`
+}
+
 // Usecase is a payment occurrence usecase.
-// Both admin and regular user have the same permissions here:
-// list, view, and mark paid / unpaid / fix date.
 type Usecase interface {
 	// List returns occurrences matching filter.
 	// IsOverdue is computed for each.
@@ -37,5 +36,5 @@ type Usecase interface {
 	Update(id int32, input UpdateInput) (*entity.PaymentOccurrence, error)
 
 	// Summary returns total amounts grouped by currency.
-	Summary() (map[entity.Currency]decimal.Decimal, error)
+	Summary() ([]CurrencySummary, error)
 }

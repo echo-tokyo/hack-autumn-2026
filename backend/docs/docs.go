@@ -331,7 +331,7 @@ const docTemplate = `{
                         "JWTAccess": []
                     }
                 ],
-                "description": "Возвращает суммарные расходы по всем периодам, сгруппированные по валютам.\nКонвертация не выполняется: суммы в RUB, USD и EUR считаются отдельно.",
+                "description": "Суммарные расходы по каждой валюте в трёх бакетах: к оплате, просрочено, оплачено.\nБакеты не пересекаются и покрывают все периоды. Конвертация не выполняется.",
                 "consumes": [
                     "application/json"
                 ],
@@ -345,11 +345,11 @@ const docTemplate = `{
                 "operationId": "payments-summary",
                 "responses": {
                     "200": {
-                        "description": "суммы по валютам, ключи RUB, USD, EUR",
+                        "description": "всегда 3 элемента: RUB, USD, EUR",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/paymentoccurrence.CurrencySummary"
                             }
                         }
                     },
@@ -829,6 +829,23 @@ const docTemplate = `{
                 "username": {
                     "description": "user username",
                     "type": "string"
+                }
+            }
+        },
+        "paymentoccurrence.CurrencySummary": {
+            "type": "object",
+            "properties": {
+                "currency": {
+                    "$ref": "#/definitions/entity.Currency"
+                },
+                "overdue": {
+                    "type": "number"
+                },
+                "paid": {
+                    "type": "number"
+                },
+                "toPay": {
+                    "type": "number"
                 }
             }
         },
