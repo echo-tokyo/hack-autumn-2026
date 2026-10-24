@@ -89,6 +89,15 @@ export const theme = createTheme({
         error: { fontSize: 'var(--mantine-font-size-xs)' },
       },
     },
+    NavLink: {
+      styles: {
+        root: {
+          borderRadius: 'var(--mantine-radius-md)',
+          paddingBlock: 'var(--mantine-spacing-sm)',
+        },
+        label: { fontSize: 'var(--mantine-font-size-md)' },
+      },
+    },
   },
 })
 

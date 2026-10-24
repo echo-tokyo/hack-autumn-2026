@@ -5,3 +5,8 @@ export interface IUser {
   login: string
   role: TUserRole
 }
+
+export interface ILoginRequest {
+  login: string
+  password: string
+}

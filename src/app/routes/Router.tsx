@@ -6,6 +6,7 @@ import { PaymentsPage } from '@/pages/payments'
 import { ROUTES } from '@/shared/config'
 
 import { AppLayout } from '../layouts/AppLayout'
+import { MainLayout } from '../layouts/MainLayout'
 import { ProtectedRoute } from '../layouts/ProtectedRoute'
 
 export const router = createBrowserRouter([
@@ -16,8 +17,13 @@ export const router = createBrowserRouter([
       {
         Component: ProtectedRoute,
         children: [
-          { path: ROUTES.payments, Component: PaymentsPage },
-          { path: '*', Component: NotFoundPage },
+          {
+            Component: MainLayout,
+            children: [
+              { path: ROUTES.payments, Component: PaymentsPage },
+              { path: '*', Component: NotFoundPage },
+            ],
+          },
         ],
       },
     ],

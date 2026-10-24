@@ -10,7 +10,7 @@ const PANEL_MIN_HEIGHT = 480
 
 export function LoginPage() {
   return (
-    <Center mih='100dvh' p='md'>
+    <Center component='main' mih='100dvh' p='md'>
       <SimpleGrid
         className={styles.card}
         cols={{ base: 1, sm: 2 }}
