@@ -3,6 +3,8 @@ import { Center, Paper, SimpleGrid, Stack, Text, Title } from '@mantine/core'
 import { LoginForm } from '@/features/auth'
 import { Logo } from '@/shared/ui'
 
+import styles from './styles.module.css'
+
 const CARD_MAX_WIDTH = 880
 const PANEL_MIN_HEIGHT = 480
 
@@ -10,6 +12,7 @@ export function LoginPage() {
   return (
     <Center mih='100dvh' p='md'>
       <SimpleGrid
+        className={styles.card}
         cols={{ base: 1, sm: 2 }}
         spacing={4}
         w='100%'
