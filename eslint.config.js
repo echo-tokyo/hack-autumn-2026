@@ -10,7 +10,12 @@ import globals from 'globals'
 import tseslint from 'typescript-eslint'
 
 export default defineConfig([
-  globalIgnores(['dist', 'node_modules', 'task']),
+  globalIgnores([
+    'dist',
+    'node_modules',
+    'task',
+    'public/mockServiceWorker.js',
+  ]),
   {
     files: ['**/*.{js,ts,tsx}'],
     extends: [js.configs.recommended],
@@ -58,6 +63,11 @@ export default defineConfig([
         { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
       ],
       '@typescript-eslint/no-explicit-any': 'warn',
+      // Allows onSubmit={handleSubmit(onSubmit)} from react-hook-form
+      '@typescript-eslint/no-misused-promises': [
+        'error',
+        { checksVoidReturn: { attributes: false } },
+      ],
       'react/jsx-key': 'warn',
       // Props are typed with TypeScript
       'react/prop-types': 'off',

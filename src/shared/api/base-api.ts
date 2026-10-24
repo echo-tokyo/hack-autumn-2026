@@ -16,7 +16,17 @@ const rawBaseQuery = fetchBaseQuery({
 
 let refreshPromise: Promise<boolean> | null = null
 
-type TBaseQuery = BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError>
+export interface IBaseQueryExtraOptions {
+  skipReauth?: boolean
+  isSessionCheck?: boolean
+}
+
+type TBaseQuery = BaseQueryFn<
+  string | FetchArgs,
+  unknown,
+  FetchBaseQueryError,
+  IBaseQueryExtraOptions
+>
 
 async function refreshSession(
   ...[, api, extraOptions]: Parameters<TBaseQuery>
@@ -29,7 +39,6 @@ async function refreshSession(
   return !result.error
 }
 
-// TODO: onAuthFailure вместо result при 401
 const baseQueryWithReauth: TBaseQuery = async (args, api, extraOptions) => {
   if (refreshPromise) {
     await refreshPromise
@@ -37,7 +46,7 @@ const baseQueryWithReauth: TBaseQuery = async (args, api, extraOptions) => {
 
   const result = await rawBaseQuery(args, api, extraOptions)
 
-  if (result.error?.status !== 401) {
+  if (result.error?.status !== 401 || extraOptions.skipReauth) {
     return result
   }
 
@@ -47,11 +56,20 @@ const baseQueryWithReauth: TBaseQuery = async (args, api, extraOptions) => {
 
   const isRefreshed = await refreshPromise
 
-  return isRefreshed ? rawBaseQuery(args, api, extraOptions) : result
+  if (isRefreshed) {
+    return rawBaseQuery(args, api, extraOptions)
+  }
+
+  if (!extraOptions.isSessionCheck) {
+    api.dispatch(baseApi.util.resetApiState())
+  }
+
+  return result
 }
 
 export const baseApi = createApi({
   reducerPath: 'api',
   baseQuery: baseQueryWithReauth,
+  tagTypes: ['Session'],
   endpoints: () => ({}),
 })

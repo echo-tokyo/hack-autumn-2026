@@ -7,9 +7,7 @@ function isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null
 }
 
-export function isFetchBaseQueryError(
-  error: unknown,
-): error is FetchBaseQueryError {
+function isFetchBaseQueryError(error: unknown): error is FetchBaseQueryError {
   return isObject(error) && 'status' in error
 }
 
@@ -17,23 +15,28 @@ function isSerializedError(error: unknown): error is SerializedError {
   return isObject(error) && typeof error.message === 'string'
 }
 
+type TStatusMessages = Partial<Record<number, string>>
+
 export function getErrorMessage(
   error: unknown,
-  fallback = DEFAULT_ERROR_MESSAGE,
+  statusMessages: TStatusMessages = {},
 ): string {
   if (isFetchBaseQueryError(error)) {
+    if (typeof error.status === 'number' && statusMessages[error.status]) {
+      return statusMessages[error.status] ?? DEFAULT_ERROR_MESSAGE
+    }
     if (error.status === 'FETCH_ERROR') {
       return 'Сервер недоступен. Проверьте подключение и попробуйте ещё раз'
     }
     if (isObject(error.data) && typeof error.data.message === 'string') {
       return error.data.message
     }
-    return fallback
+    return DEFAULT_ERROR_MESSAGE
   }
 
   if (isSerializedError(error)) {
-    return error.message ?? fallback
+    return error.message ?? DEFAULT_ERROR_MESSAGE
   }
 
-  return fallback
+  return DEFAULT_ERROR_MESSAGE
 }

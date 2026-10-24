@@ -1,2 +1,2 @@
 export { baseApi } from './base-api'
-export { getErrorMessage, isFetchBaseQueryError } from './query-error'
+export { getErrorMessage } from './query-error'

@@ -15,11 +15,15 @@
     "check": "npm run typecheck && npm run lint && npm run lint:fsd && npm run format:check"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.9.2",
     "@reduxjs/toolkit": "^2.13.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
+    "react-hook-form": "^7.91.0",
     "react-redux": "^9.3.0",
-    "react-router": "^8.5.0"
+    "react-router": "^8.5.0",
+    "sonner": "^2.0.8",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@babel/core": "^7.29.7",
@@ -40,10 +44,16 @@
     "eslint-plugin-react-refresh": "^0.5.7",
     "eslint-plugin-simple-import-sort": "^14.0.0",
     "globals": "^17.13.0",
+    "msw": "^3.0.3",
     "prettier": "^3.9.10",
     "steiger": "^0.8.0",
     "typescript": "~6.0.3",
     "typescript-eslint": "^8.71.2",
     "vite": "^8.3.4"
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
   }
 }
