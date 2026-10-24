@@ -45,12 +45,14 @@ func (r *RepoDB) Create(occ *entity.PaymentOccurrence) error {
 	return nil
 }
 
-// GetByID returns payment occurrence by given id.
 func (r *RepoDB) GetByID(id int32) (*entity.PaymentOccurrence, error) {
 	var occ entity.PaymentOccurrence
 
 	err := r.dbStorage.
-		Where("id = ?", id).
+		Model(&entity.PaymentOccurrence{}).
+		Select("payment_occurrences.*, recurring_payments.name AS recurring_payment_name").
+		Joins("JOIN recurring_payments ON recurring_payments.id = payment_occurrences.recurring_payment_id").
+		Where("payment_occurrences.id = ?", id).
 		First(&occ).Error
 
 	if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -73,31 +75,39 @@ func (r *RepoDB) List(filter occurrence.ListFilter) ([]*entity.PaymentOccurrence
 	}
 
 	var occurrences []*entity.PaymentOccurrence
-	q := r.dbStorage.Model(&entity.PaymentOccurrence{}).
+
+	q := r.dbStorage.
+		Model(&entity.PaymentOccurrence{}).
+		Select("payment_occurrences.*, recurring_payments.name AS recurring_payment_name").
 		Joins("JOIN recurring_payments ON recurring_payments.id = payment_occurrences.recurring_payment_id").
 		Where("recurring_payments.is_deleted = ?", false)
 
 	if filter.RecurringPaymentID != nil {
 		q = q.Where("payment_occurrences.recurring_payment_id = ?", *filter.RecurringPaymentID)
 	}
-
 	if filter.Currency != nil {
 		q = q.Where("payment_occurrences.currency = ?", *filter.Currency)
 	}
-
 	if filter.Status != nil {
 		today := filter.Today.Format("2006-01-02")
 		switch *filter.Status {
 		case occurrence.StatusPaid:
-			q = q.Where("is_paid = ?", true)
+			q = q.Where("payment_occurrences.is_paid = ?", true)
 		case occurrence.StatusUnpaid:
-			q = q.Where("is_paid = ? AND due_date >= ?", false, today)
+			q = q.Where(
+				"payment_occurrences.is_paid = ? AND payment_occurrences.due_date >= ?",
+				false, today,
+			)
 		case occurrence.StatusOverdue:
-			q = q.Where("is_paid = ? AND due_date < ?", false, today)
+			q = q.Where(
+				"payment_occurrences.is_paid = ? AND payment_occurrences.due_date < ?",
+				false, today,
+			)
 		}
 	}
-
-	if err := q.Order("due_date ASC, id ASC").Find(&occurrences).Error; err != nil {
+	if err := q.
+		Order("payment_occurrences.due_date ASC, payment_occurrences.id ASC").
+		Find(&occurrences).Error; err != nil {
 		return nil, fmt.Errorf("list: %w", err)
 	}
 
@@ -109,8 +119,11 @@ func (r *RepoDB) GetLatestByRecurringPayment(recurringPaymentID int32) (*entity.
 	var occ entity.PaymentOccurrence
 
 	err := r.dbStorage.
-		Where("recurring_payment_id = ?", recurringPaymentID).
-		Order("due_date DESC, id DESC").
+		Model(&entity.PaymentOccurrence{}).
+		Select("payment_occurrences.*, recurring_payments.name AS recurring_payment_name").
+		Joins("JOIN recurring_payments ON recurring_payments.id = payment_occurrences.recurring_payment_id").
+		Where("payment_occurrences.recurring_payment_id = ?", recurringPaymentID).
+		Order("payment_occurrences.due_date DESC, payment_occurrences.id DESC").
 		First(&occ).Error
 
 	if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -125,7 +138,6 @@ func (r *RepoDB) GetLatestByRecurringPayment(recurringPaymentID int32) (*entity.
 			recurringPaymentID, err,
 		)
 	}
-
 	return &occ, nil
 }
 
@@ -163,6 +175,7 @@ func (r *RepoDB) ListToRemind(deadline time.Time) ([]*entity.PaymentOccurrence, 
 
 	err := r.dbStorage.
 		Model(&entity.PaymentOccurrence{}).
+		Select("payment_occurrences.*, recurring_payments.name AS recurring_payment_name").
 		Joins("JOIN recurring_payments ON recurring_payments.id = payment_occurrences.recurring_payment_id").
 		Where("payment_occurrences.is_paid = ?", false).
 		Where("payment_occurrences.is_notified = ?", false).

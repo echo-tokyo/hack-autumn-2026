@@ -761,6 +761,9 @@ const docTemplate = `{
                 "isPaid": {
                     "type": "boolean"
                 },
+                "name": {
+                    "type": "string"
+                },
                 "notifiedAt": {
                     "type": "string"
                 },
