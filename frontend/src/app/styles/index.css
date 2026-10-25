@@ -1,0 +1,22 @@
+body {
+  font-variant-numeric: tabular-nums;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--mantine-color-dark-4) transparent;
+}
+
+::selection {
+  color: var(--mantine-color-black);
+  background-color: var(--color-accent);
+}
+
+.mantine-Button-root:where(
+  :disabled:not([data-loading]),
+  [data-disabled]:not([data-loading])
+) {
+  background-color: var(--button-bg);
+  color: var(--button-color);
+  opacity: 0.4;
+}

@@ -1,0 +1,13 @@
+.fill {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+@media (max-width: 48em) {
+  .fill {
+    flex: none;
+  }
+}

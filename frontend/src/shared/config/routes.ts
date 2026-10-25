@@ -1,0 +1,7 @@
+export const ROUTES = {
+  login: '/login',
+  payments: '/',
+  occurrences: '/occurrences',
+  recurringPayments: '/recurring-payments',
+  users: '/users',
+} as const

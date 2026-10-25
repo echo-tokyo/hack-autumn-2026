@@ -1,0 +1,4 @@
+.link[aria-current='page'] {
+  background-color: var(--color-surface-2);
+  font-weight: 600;
+}
