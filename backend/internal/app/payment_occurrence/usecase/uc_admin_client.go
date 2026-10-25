@@ -30,11 +30,7 @@ func NewUC(cfg *config.Config, repo occurrence.RepositoryDB) *UC {
 // List returns occurrences matching filter.
 // IsOverdue is computed for each.
 func (u *UC) List(filter occurrence.ListFilter) ([]*entity.PaymentOccurrence, error) {
-	today, err := u.today()
-	if err != nil {
-		return nil, fmt.Errorf("resolve today: %w", err)
-	}
-
+	today := u.today()
 	// Inject today into filter so repository can compute paid/unpaid/overdue.
 	filter.Today = today
 
@@ -61,11 +57,7 @@ func (u *UC) GetByID(id int32) (*entity.PaymentOccurrence, error) {
 		return nil, fmt.Errorf("get by id: %w", err)
 	}
 
-	today, err := u.today()
-	if err != nil {
-		return nil, fmt.Errorf("resolve today: %w", err)
-	}
-
+	today := u.today()
 	occ.IsOverdue, occ.OverdueDays = computeOverdue(occ, today)
 	return occ, nil
 }
@@ -84,11 +76,7 @@ func (u *UC) Update(id int32, input occurrence.UpdateInput) (*entity.PaymentOccu
 		return nil, fmt.Errorf("get by id: %w", err)
 	}
 
-	today, err := u.today()
-	if err != nil {
-		return nil, fmt.Errorf("resolve today: %w", err)
-	}
-
+	today := u.today()
 	switch {
 	case input.IsPaid != nil && !*input.IsPaid:
 		// Unmark: clear payment date (per ТЗ).
@@ -101,7 +89,7 @@ func (u *UC) Update(id int32, input occurrence.UpdateInput) (*entity.PaymentOccu
 		if input.PaymentDate != nil {
 			payDate = truncateToDate(*input.PaymentDate)
 		}
-		if payDate.After(today) {
+		if isFutureDate(payDate, today) {
 			return nil, fmt.Errorf("%w: payment_date cannot be in the future", occurrence.ErrInvalidArgument)
 		}
 		occ.IsPaid = true
@@ -116,7 +104,7 @@ func (u *UC) Update(id int32, input occurrence.UpdateInput) (*entity.PaymentOccu
 			)
 		}
 		payDate := truncateToDate(*input.PaymentDate)
-		if payDate.After(today) {
+		if isFutureDate(payDate, today) {
 			return nil, fmt.Errorf("%w: payment_date cannot be in the future", occurrence.ErrInvalidArgument)
 		}
 		occ.PaymentDate = &payDate
@@ -131,12 +119,7 @@ func (u *UC) Update(id int32, input occurrence.UpdateInput) (*entity.PaymentOccu
 }
 
 func (u *UC) Summary() ([]occurrence.CurrencySummary, error) {
-	today, err := u.today()
-	if err != nil {
-		return nil, fmt.Errorf("resolve today: %w", err)
-	}
-
-	raw, err := u.repo.Summary(today)
+	raw, err := u.repo.Summary(u.today())
 	if err != nil {
 		return nil, fmt.Errorf("summary: %w", err)
 	}
@@ -158,10 +141,16 @@ func (u *UC) Summary() ([]occurrence.CurrencySummary, error) {
 	return result, nil
 }
 
-// today returns current date (00:00:00) in configured timezone.
-func (u *UC) today() (time.Time, error) {
+// isFutureDate reports whether d is strictly after ref (calendar days).
+// Both are compared as YYYY-MM-DD strings, ignoring time and timezone.
+func isFutureDate(d, ref time.Time) bool {
+	return d.Format("2006-01-02") > ref.Format("2006-01-02")
+}
+
+// today returns current date (00:00:00) in UTC.
+func (u *UC) today() time.Time {
 	now := time.Now().In(u.cfg.Timezone)
-	return time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, u.cfg.Timezone), nil
+	return time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.UTC)
 }
 
 // computeOverdue returns whether the occurrence is currently overdue
