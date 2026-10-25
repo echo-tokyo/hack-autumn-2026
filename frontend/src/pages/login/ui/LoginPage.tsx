@@ -1,7 +1,7 @@
 import { Center, SimpleGrid, Stack, Text, Title } from '@mantine/core'
 
 import { LoginForm } from '@/features/auth'
-import { Logo, Panel } from '@/shared/ui'
+import { BrandPattern, BrandWatermark, Panel } from '@/shared/ui'
 
 import styles from './styles.module.css'
 
@@ -18,20 +18,35 @@ export function LoginPage() {
         w='100%'
         maw={CARD_MAX_WIDTH}
       >
-        <Panel radius='xl' p='xl' mih={{ sm: PANEL_MIN_HEIGHT }}>
-          <Stack justify='space-between' h='100%' gap='xl'>
-            <Stack gap='xs'>
-              <Title order={1}>Вход в Invoice Keeper</Title>
-              <Text c='dimmed' fz='lg'>
-                что и когда оплатить, что уже оплачено и что просрочено
-              </Text>
-            </Stack>
-            <Logo />
+        <Panel
+          className={styles.brandPanel}
+          bg='var(--mantine-color-black)'
+          radius='xl'
+          p='xl'
+          mih={{ base: PANEL_MIN_HEIGHT / 2, sm: PANEL_MIN_HEIGHT }}
+        >
+          <Stack gap='xs' className={styles.content}>
+            <Title order={1}>Вход в Invoice Keeper</Title>
+            <Text c='dimmed' fz='lg'>
+              что и когда оплатить, что уже оплачено и что просрочено
+            </Text>
           </Stack>
+          <BrandPattern className={styles.pattern} />
         </Panel>
 
-        <Panel radius='xl' p='xl' mih={{ sm: PANEL_MIN_HEIGHT }}>
-          <Stack justify='space-between' h='100%' gap='xl'>
+        <Panel
+          className={styles.formPanel}
+          radius='xl'
+          p='xl'
+          mih={{ sm: PANEL_MIN_HEIGHT }}
+        >
+          <BrandWatermark />
+          <Stack
+            justify='space-between'
+            h='100%'
+            gap='xl'
+            className={styles.content}
+          >
             <LoginForm />
             <Text c='dimmed' fz='sm'>
               Нет учётной записи? Её создаёт администратор

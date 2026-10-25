@@ -26,13 +26,27 @@ async function enableMocking() {
   await worker.start({ onUnhandledFrame: 'bypass' })
 }
 
+const FONT_LOAD_TIMEOUT = 1500
+const FONT_SAMPLE_TEXT = 'Aa Аа 0'
+const APP_FONTS = ["400 1em 'Inter Variable'", "700 1em 'Exo 2 Variable'"]
+
+async function loadFonts() {
+  const fonts = APP_FONTS.map((font) =>
+    document.fonts.load(font, FONT_SAMPLE_TEXT),
+  )
+  const timeout = new Promise((resolve) =>
+    setTimeout(resolve, FONT_LOAD_TIMEOUT),
+  )
+  await Promise.race([Promise.allSettled(fonts), timeout])
+}
+
 const rootElement = document.getElementById('root')
 
 if (!rootElement) {
   throw new Error('Root element #root not found')
 }
 
-await enableMocking()
+await Promise.all([enableMocking(), loadFonts()])
 
 const router = createAppRouter()
 

@@ -1,6 +1,6 @@
 import { AppShell, Burger, Group, Paper, Text } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
-import { Outlet } from 'react-router'
+import { Outlet, useLocation } from 'react-router'
 
 import { Sidebar } from '@/widgets/sidebar'
 
@@ -11,6 +11,7 @@ const MOBILE_HEADER_HEIGHT = 56
 
 export function MainLayout() {
   const [isNavbarOpened, { toggle, close }] = useDisclosure()
+  const location = useLocation()
 
   return (
     <AppShell
@@ -41,7 +42,9 @@ export function MainLayout() {
 
       <AppShell.Main className={styles.main}>
         <Paper className={styles.panel} bg='var(--color-surface-1)' radius='xl'>
-          <Outlet />
+          <div key={location.pathname} className={styles.page}>
+            <Outlet />
+          </div>
         </Paper>
       </AppShell.Main>
     </AppShell>

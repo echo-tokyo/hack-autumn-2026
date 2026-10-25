@@ -7,6 +7,7 @@ export {
 } from './calendar'
 export { daysBetween, formatLongDate, formatShortDate, todayIso } from './date'
 export { formatAmount, formatMoney } from './money'
+export { useCountUp } from './use-count-up'
 export { useShowSkeleton } from './use-show-skeleton'
 export {
   type ISortState,
