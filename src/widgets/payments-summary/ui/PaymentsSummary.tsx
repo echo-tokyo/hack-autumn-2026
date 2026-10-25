@@ -14,6 +14,7 @@ import {
   useGetPaymentsSummaryQuery,
 } from '@/entities/payment-summary'
 import { ICON_SIZE } from '@/shared/config'
+import { useShowSkeleton } from '@/shared/lib'
 import { Panel, QueryError } from '@/shared/ui'
 
 const SKELETON_COUNT = 3
@@ -22,6 +23,7 @@ const HINT = 'Суммы считаются отдельно по каждой �
 
 export function PaymentsSummary() {
   const { data, isLoading, isError, refetch } = useGetPaymentsSummaryQuery()
+  const showSkeleton = useShowSkeleton(isLoading)
 
   return (
     <Stack component='section' gap='sm'>
@@ -34,7 +36,7 @@ export function PaymentsSummary() {
         </Tooltip>
       </Group>
       <Panel p='md'>
-        {isLoading && (
+        {showSkeleton && (
           <SimpleGrid cols={{ base: 1, md: SKELETON_COUNT }} spacing='xl'>
             {Array.from({ length: SKELETON_COUNT }, (_, index) => (
               <Skeleton key={index} h={SKELETON_HEIGHT} />
@@ -46,7 +48,7 @@ export function PaymentsSummary() {
           <QueryError message='Не удалось загрузить итоги.' onRetry={refetch} />
         )}
 
-        {data && <CurrencyTotalsBars totals={data.totals} />}
+        {data && <CurrencyTotalsBars totals={data} />}
       </Panel>
     </Stack>
   )

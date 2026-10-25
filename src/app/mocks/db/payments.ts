@@ -26,7 +26,7 @@ export interface INewRecurringPayment {
   name: string
   amount: number
   currency: TMockCurrency
-  firstDueDate: string
+  startDate: string
 }
 
 const today = todayIso()
@@ -240,15 +240,12 @@ function latestDueDate(recurringPaymentId: number) {
     .at(-1)
 }
 
-function nextDueDate(recurringPaymentId: number) {
-  const unpaidDueDates = occurrences
-    .filter(
-      (item) => item.recurringPaymentId === recurringPaymentId && !item.isPaid,
-    )
+function firstDueDate(recurringPaymentId: number) {
+  return occurrences
+    .filter((item) => item.recurringPaymentId === recurringPaymentId)
     .map((item) => item.dueDate)
     .sort()
-
-  return unpaidDueDates[0] ?? latestDueDate(recurringPaymentId)
+    .at(0)
 }
 
 export function ensureUpcomingOccurrences() {
@@ -283,11 +280,15 @@ function overdueDays(occurrence: IMockOccurrence) {
   )
 }
 
-function occurrenceStatus(occurrence: IMockOccurrence) {
+export function occurrenceStatus(occurrence: IMockOccurrence) {
   if (occurrence.isPaid) {
     return 'paid'
   }
   return overdueDays(occurrence) > 0 ? 'overdue' : 'unpaid'
+}
+
+function toDateTime(date: string) {
+  return `${date}T00:00:00Z`
 }
 
 export function toOccurrenceDto(occurrence: IMockOccurrence) {
@@ -295,7 +296,9 @@ export function toOccurrenceDto(occurrence: IMockOccurrence) {
 
   return {
     ...occurrence,
-    status: occurrenceStatus(occurrence),
+    dueDate: toDateTime(occurrence.dueDate),
+    paymentDate: occurrence.paymentDate && toDateTime(occurrence.paymentDate),
+    isOverdue: occurrenceStatus(occurrence) === 'overdue',
     overdueDays: overdueDays(occurrence),
     name: payment?.name ?? '',
     amount: payment?.amount ?? 0,
@@ -304,9 +307,17 @@ export function toOccurrenceDto(occurrence: IMockOccurrence) {
 }
 
 export function toRecurringPaymentDto(payment: IMockRecurringPayment) {
-  const { id, name, amount, currency, period } = payment
+  const { id, name, amount, currency, dayOfMonth, isActive } = payment
 
-  return { id, name, amount, currency, period, nextDueDate: nextDueDate(id) }
+  return {
+    id,
+    name,
+    amount,
+    currency,
+    billingDay: dayOfMonth,
+    startDate: firstDueDate(id),
+    isDeleted: !isActive,
+  }
 }
 
 export function createRecurringPayment(input: INewRecurringPayment) {
@@ -316,12 +327,12 @@ export function createRecurringPayment(input: INewRecurringPayment) {
     amount: input.amount,
     currency: input.currency,
     period: 'monthly',
-    dayOfMonth: dayOfMonth(input.firstDueDate),
+    dayOfMonth: dayOfMonth(input.startDate),
     isActive: true,
   }
 
   recurringPayments.push(payment)
-  occurrences.push(createOccurrence(payment.id, input.firstDueDate, null))
+  occurrences.push(createOccurrence(payment.id, input.startDate, null))
   ensureUpcomingOccurrences()
 
   return payment

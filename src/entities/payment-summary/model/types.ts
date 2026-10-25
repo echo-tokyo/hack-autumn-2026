@@ -6,8 +6,3 @@ export interface ICurrencyTotals {
   overdue: number
   paid: number
 }
-
-export interface IPaymentsSummary {
-  date: string
-  totals: ICurrencyTotals[]
-}

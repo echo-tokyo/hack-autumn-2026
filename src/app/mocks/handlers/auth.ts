@@ -29,7 +29,7 @@ export const authHandlers = [
       if (!user) {
         return HttpResponse.json(
           { message: 'Неверный логин или пароль' },
-          { status: 401 },
+          { status: 400 },
         )
       }
 
@@ -48,7 +48,7 @@ export const authHandlers = [
     return user ? HttpResponse.json(toUserDto(user)) : unauthorized()
   }),
 
-  http.post(`${BASE_URL}/auth/refresh`, async ({ cookies }) => {
+  http.post(`${BASE_URL}/auth/obtain`, async ({ cookies }) => {
     await delay()
     const user = findUserById(cookies[REFRESH_COOKIE])
 

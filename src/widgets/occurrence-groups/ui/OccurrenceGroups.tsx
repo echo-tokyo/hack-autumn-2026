@@ -4,8 +4,8 @@ import {
   OccurrenceRow,
   useGetPaymentOccurrencesQuery,
 } from '@/entities/payment-occurrence'
-import { useServerToday } from '@/entities/payment-summary'
 import { MarkPaymentButton } from '@/features/mark-payment'
+import { todayIso, useShowSkeleton } from '@/shared/lib'
 import { QueryError, SkeletonRows } from '@/shared/ui'
 
 import { groupOccurrences } from '../model/group-occurrences'
@@ -13,13 +13,16 @@ import { GroupMessage, OccurrenceGroup } from './OccurrenceGroup'
 
 export function OccurrenceGroups() {
   const { data, isLoading, isError, refetch } = useGetPaymentOccurrencesQuery()
-  const today = useServerToday()
+  const showSkeleton = useShowSkeleton(isLoading)
+  const today = todayIso()
 
   if (isLoading) {
     return (
-      <OccurrenceGroup title='Платежи'>
-        <SkeletonRows rowHeight={56} />
-      </OccurrenceGroup>
+      showSkeleton && (
+        <OccurrenceGroup title='Платежи'>
+          <SkeletonRows rowHeight={56} />
+        </OccurrenceGroup>
+      )
     )
   }
 

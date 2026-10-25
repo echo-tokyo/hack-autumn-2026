@@ -30,7 +30,7 @@ function requireAdmin(cookies: Record<string, string>) {
   if (!user) {
     return unauthorized()
   }
-  return user.role === 'admin' ? null : forbidden()
+  return user.isAdmin ? null : forbidden()
 }
 
 function conflict() {
@@ -87,7 +87,7 @@ export const usersHandlers = [
       if (!user) {
         return notFound('Пользователь не найден')
       }
-      if (user.role === 'admin') {
+      if (user.isAdmin) {
         return HttpResponse.json(
           { message: ADMIN_LOCKED_MESSAGE },
           { status: 403 },
@@ -123,7 +123,7 @@ export const usersHandlers = [
     if (!user) {
       return notFound('Пользователь не найден')
     }
-    if (user.role === 'admin') {
+    if (user.isAdmin) {
       return HttpResponse.json(
         { message: ADMIN_LOCKED_MESSAGE },
         { status: 403 },

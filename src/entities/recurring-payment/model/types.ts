@@ -7,14 +7,13 @@ export interface IRecurringPayment {
   name: string
   amount: number
   currency: TCurrency
-  period: TPaymentPeriod
-  nextDueDate: string | null
+  billingDay: number
+  startDate: string
 }
 
 export interface ICreateRecurringPayment {
   name: string
   amount: number
   currency: TCurrency
-  period: TPaymentPeriod
-  firstDueDate: string
+  startDate: string
 }

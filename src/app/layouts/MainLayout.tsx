@@ -35,7 +35,7 @@ export function MainLayout() {
         </Group>
       </AppShell.Header>
 
-      <AppShell.Navbar p='md'>
+      <AppShell.Navbar p='md' className={styles.navbar}>
         <Sidebar onNavigate={close} />
       </AppShell.Navbar>
 

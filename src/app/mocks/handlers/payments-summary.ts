@@ -3,11 +3,11 @@ import { delay, http, HttpResponse } from 'msw'
 import { todayIso } from '../dates'
 import {
   ensureUpcomingOccurrences,
+  findRecurringPayment,
   isOverdueAt,
   isUnpaidAt,
   MOCK_CURRENCIES,
   occurrences,
-  toOccurrenceDto,
 } from '../db/payments'
 import { BASE_URL, getSessionUser, unauthorized } from '../session'
 
@@ -20,7 +20,14 @@ export const paymentsSummaryHandlers = [
 
     ensureUpcomingOccurrences()
     const date = new URL(request.url).searchParams.get('date') ?? todayIso()
-    const items = occurrences.map(toOccurrenceDto)
+    const items = occurrences.map((occurrence) => {
+      const payment = findRecurringPayment(occurrence.recurringPaymentId)
+      return {
+        ...occurrence,
+        amount: payment?.amount ?? 0,
+        currency: payment?.currency ?? 'RUB',
+      }
+    })
 
     const totals = MOCK_CURRENCIES.map((currency) => {
       const byCurrency = items.filter((item) => item.currency === currency)
@@ -35,6 +42,6 @@ export const paymentsSummaryHandlers = [
       }
     })
 
-    return HttpResponse.json({ date, totals })
+    return HttpResponse.json(totals)
   }),
 ]

@@ -5,12 +5,43 @@ import {
   formatPaymentDate,
   getOccurrenceStatus,
   type IPaymentOccurrence,
+  type TOccurrenceStatus,
 } from '@/entities/payment-occurrence'
 import { MarkPaymentButton } from '@/features/mark-payment'
-import { formatAmount, formatShortDate } from '@/shared/lib'
-import { ScrollTable } from '@/shared/ui'
+import {
+  formatAmount,
+  formatShortDate,
+  type TSortGetters,
+  useSort,
+} from '@/shared/lib'
+import { ScrollTable, SortableTh } from '@/shared/ui'
 
-const TABLE_MIN_WIDTH = 1140
+const TABLE_MIN_WIDTH = 1160
+
+const STATUS_ORDER: Record<TOccurrenceStatus, number> = {
+  overdue: 0,
+  unpaid: 1,
+  paid: 2,
+}
+
+type TSortKey =
+  | 'name'
+  | 'amount'
+  | 'currency'
+  | 'dueDate'
+  | 'status'
+  | 'paymentDate'
+  | 'overdueDays'
+
+const SORT_GETTERS: TSortGetters<IPaymentOccurrence, TSortKey> = {
+  name: (occurrence) => occurrence.name,
+  amount: (occurrence) => occurrence.amount,
+  currency: (occurrence) => occurrence.currency,
+  dueDate: (occurrence) => occurrence.dueDate,
+  status: (occurrence) => STATUS_ORDER[occurrence.status],
+  paymentDate: (occurrence) => occurrence.paymentDate ?? '',
+  overdueDays: (occurrence) => occurrence.overdueDays,
+}
 
 interface IOccurrencesTableViewProps {
   occurrences: IPaymentOccurrence[]
@@ -19,26 +50,43 @@ interface IOccurrencesTableViewProps {
 export function OccurrencesTableView({
   occurrences,
 }: IOccurrencesTableViewProps) {
+  const { sortedRows, sort, toggleSort } = useSort(occurrences, SORT_GETTERS)
+
+  function getSortProps(key: TSortKey) {
+    return {
+      direction: sort?.key === key ? sort.direction : null,
+      onSort: () => toggleSort(key),
+    }
+  }
+
   return (
     <ScrollTable minWidth={TABLE_MIN_WIDTH}>
       <Table.Thead>
         <Table.Tr>
-          <Table.Th>Название</Table.Th>
-          <Table.Th ta='right' w={120}>
+          <SortableTh {...getSortProps('name')}>Название</SortableTh>
+          <SortableTh ta='right' w={120} {...getSortProps('amount')}>
             Сумма
-          </Table.Th>
-          <Table.Th w={90}>Валюта</Table.Th>
-          <Table.Th w={120}>Срок оплаты</Table.Th>
-          <Table.Th w={150}>Статус</Table.Th>
-          <Table.Th w={130}>Дата оплаты</Table.Th>
-          <Table.Th ta='right' w={110}>
+          </SortableTh>
+          <SortableTh w={90} {...getSortProps('currency')}>
+            Валюта
+          </SortableTh>
+          <SortableTh w={140} {...getSortProps('dueDate')}>
+            Срок оплаты
+          </SortableTh>
+          <SortableTh w={150} {...getSortProps('status')}>
+            Статус
+          </SortableTh>
+          <SortableTh w={130} {...getSortProps('paymentDate')}>
+            Дата оплаты
+          </SortableTh>
+          <SortableTh ta='right' w={110} {...getSortProps('overdueDays')}>
             Просрочка
-          </Table.Th>
+          </SortableTh>
           <Table.Th w={196}>Действие</Table.Th>
         </Table.Tr>
       </Table.Thead>
       <Table.Tbody>
-        {occurrences.map((occurrence) => {
+        {sortedRows.map((occurrence) => {
           const status = getOccurrenceStatus(occurrence.status)
 
           return (

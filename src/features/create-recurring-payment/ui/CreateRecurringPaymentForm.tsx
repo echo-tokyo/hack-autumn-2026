@@ -102,7 +102,7 @@ export function CreateRecurringPaymentForm({
 
         <SimpleGrid cols={2} spacing='md'>
           <Controller
-            name='firstDueDate'
+            name='startDate'
             control={control}
             render={({ field, fieldState }) => (
               <DatePickerInput

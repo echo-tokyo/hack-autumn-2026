@@ -28,7 +28,7 @@ function validate(body: INewRecurringPayment) {
   if (!MOCK_CURRENCIES.includes(body.currency)) {
     return 'Валюта должна быть RUB, USD или EUR'
   }
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(body.firstDueDate)) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(body.startDate)) {
     return 'Укажите дату ближайшей оплаты'
   }
   return null
@@ -57,7 +57,7 @@ export const recurringPaymentsHandlers = [
       if (!user) {
         return unauthorized()
       }
-      if (user.role !== 'admin') {
+      if (!user.isAdmin) {
         return forbidden()
       }
 
@@ -81,7 +81,7 @@ export const recurringPaymentsHandlers = [
       if (!user) {
         return unauthorized()
       }
-      if (user.role !== 'admin') {
+      if (!user.isAdmin) {
         return forbidden()
       }
 

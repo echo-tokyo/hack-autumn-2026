@@ -5,7 +5,10 @@ import { type ILoginRequest, useLoginMutation } from '@/entities/user'
 import { getErrorMessage } from '@/shared/api'
 import { ROUTES } from '@/shared/config'
 
-const LOGIN_ERROR_MESSAGES = { 401: 'Неверный логин или пароль' }
+const LOGIN_ERROR_MESSAGES = {
+  400: 'Неверный логин или пароль',
+  401: 'Неверный логин или пароль',
+}
 
 function getRedirectPath(state: unknown): string {
   if (

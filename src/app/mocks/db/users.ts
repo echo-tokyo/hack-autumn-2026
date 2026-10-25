@@ -2,19 +2,19 @@ export interface IMockUser {
   id: number
   username: string
   password: string
-  role: 'admin' | 'user'
+  isAdmin: boolean
 }
 
 export const mockUsers: IMockUser[] = [
-  { id: 1, username: 'admin', password: 'admin', role: 'admin' },
-  { id: 2, username: 'buhgalter', password: 'buhgalter', role: 'user' },
-  { id: 3, username: 'manager', password: 'manager', role: 'user' },
+  { id: 1, username: 'admin', password: 'admin', isAdmin: true },
+  { id: 2, username: 'buhgalter', password: 'buhgalter', isAdmin: false },
+  { id: 3, username: 'manager', password: 'manager', isAdmin: false },
 ]
 
 let nextUserId = mockUsers.length + 1
 
-export function toUserDto({ id, username, role }: IMockUser) {
-  return { id, username, role }
+export function toUserDto({ id, username, isAdmin }: IMockUser) {
+  return { id, username, isAdmin }
 }
 
 export function findUserById(id: string | undefined) {
@@ -28,7 +28,12 @@ export function isUsernameTaken(username: string, exceptId?: number) {
 }
 
 export function createMockUser(username: string, password: string) {
-  const user: IMockUser = { id: nextUserId++, username, password, role: 'user' }
+  const user: IMockUser = {
+    id: nextUserId++,
+    username,
+    password,
+    isAdmin: false,
+  }
   mockUsers.push(user)
   return user
 }

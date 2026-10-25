@@ -5,7 +5,7 @@ import {
   useGetRecurringPaymentsQuery,
 } from '@/entities/recurring-payment'
 import { DeleteRecurringPaymentButton } from '@/features/delete-recurring-payment'
-import { formatAmount, formatShortDate } from '@/shared/lib'
+import { formatAmount, useShowSkeleton } from '@/shared/lib'
 import { Panel, QueryError, ScrollTable, SkeletonRows } from '@/shared/ui'
 
 const TABLE_MIN_WIDTH = 940
@@ -18,10 +18,11 @@ export function RecurringPaymentsTable() {
     refetch,
   } = useGetRecurringPaymentsQuery()
   const isReady = !isLoading && !isError
+  const showSkeleton = useShowSkeleton(isLoading)
 
   return (
     <Panel fill px='lg' py='sm'>
-      {isLoading && <SkeletonRows />}
+      {showSkeleton && <SkeletonRows />}
 
       {!isLoading && isError && (
         <QueryError
@@ -47,7 +48,7 @@ export function RecurringPaymentsTable() {
               </Table.Th>
               <Table.Th w={100}>Валюта</Table.Th>
               <Table.Th w={160}>Периодичность</Table.Th>
-              <Table.Th w={180}>Ближайшая оплата</Table.Th>
+              <Table.Th w={180}>Число оплаты</Table.Th>
               <Table.Th w={130}>Действие</Table.Th>
             </Table.Tr>
           </Table.Thead>
@@ -57,12 +58,8 @@ export function RecurringPaymentsTable() {
                 <Table.Td fw={600}>{payment.name}</Table.Td>
                 <Table.Td ta='right'>{formatAmount(payment.amount)}</Table.Td>
                 <Table.Td>{payment.currency}</Table.Td>
-                <Table.Td>{PERIOD_LABELS[payment.period]}</Table.Td>
-                <Table.Td>
-                  {payment.nextDueDate
-                    ? formatShortDate(payment.nextDueDate)
-                    : '-'}
-                </Table.Td>
+                <Table.Td>{PERIOD_LABELS.monthly}</Table.Td>
+                <Table.Td>{payment.billingDay}-го числа</Table.Td>
                 <Table.Td>
                   <DeleteRecurringPaymentButton payment={payment} />
                 </Table.Td>

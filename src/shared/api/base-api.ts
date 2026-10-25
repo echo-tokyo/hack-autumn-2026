@@ -7,7 +7,7 @@ import {
 } from '@reduxjs/toolkit/query/react'
 
 const BASE_API_URL = import.meta.env.VITE_API_BASE_URL
-const REFRESH_URL = '/auth/refresh'
+const REFRESH_URL = '/auth/obtain'
 const REFETCH_AFTER_SECONDS = 30
 
 const rawBaseQuery = fetchBaseQuery({

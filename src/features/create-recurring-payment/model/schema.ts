@@ -13,7 +13,7 @@ export const recurringPaymentSchema = z.object({
     .positive('Сумма должна быть больше нуля'),
   currency: z.enum(CURRENCIES),
   period: z.literal('monthly'),
-  firstDueDate: z
+  startDate: z
     .string({ message: 'Укажите дату ближайшей оплаты' })
     .min(1, 'Укажите дату ближайшей оплаты'),
 })

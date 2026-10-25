@@ -1,6 +1,6 @@
 import { Box, Stack } from '@mantine/core'
 
-import { isAdmin, useCurrentUser } from '@/entities/user'
+import { useCurrentUser } from '@/entities/user'
 import { LogoutButton } from '@/features/logout'
 import { Logo } from '@/shared/ui'
 
@@ -14,20 +14,10 @@ interface ISidebarProps {
 
 export function Sidebar({ onNavigate }: ISidebarProps) {
   const user = useCurrentUser()
-  const groups = NAV_GROUPS.filter((group) => {
-    if (!group.adminOnly) {
-      return true
-    }
-
-    if (group.adminOnly === isAdmin(user)) {
-      return true
-    }
-
-    return false
-  })
+  const groups = NAV_GROUPS.filter((group) => !group.adminOnly || user.isAdmin)
 
   return (
-    <Stack h='100%' justify='space-between' gap='xl'>
+    <Stack mih='100%' justify='space-between' gap='xl'>
       <Stack gap='xl'>
         <SidebarAccount user={user} />
         <SidebarNav groups={groups} onNavigate={onNavigate} />

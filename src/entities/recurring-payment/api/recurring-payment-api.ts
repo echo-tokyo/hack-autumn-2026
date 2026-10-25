@@ -19,7 +19,17 @@ export const recurringPaymentApi = baseApi.injectEndpoints({
       IRecurringPayment,
       ICreateRecurringPayment
     >({
-      query: (body) => ({ url: '/recurring-payments', method: 'POST', body }),
+      query: ({ name, amount, currency, startDate }) => ({
+        url: '/recurring-payments',
+        method: 'POST',
+        body: {
+          name,
+          amount,
+          currency,
+          startDate,
+          billingDay: Number(startDate.slice(8)),
+        },
+      }),
       invalidatesTags: [...AFFECTED_TAGS],
     }),
 

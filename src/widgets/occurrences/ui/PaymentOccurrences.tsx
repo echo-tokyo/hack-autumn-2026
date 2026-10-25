@@ -13,6 +13,7 @@ import {
   useGetPaymentOccurrencesQuery,
 } from '@/entities/payment-occurrence'
 import { OccurrencesFilters } from '@/features/filter-occurrences'
+import { useShowSkeleton } from '@/shared/lib'
 import { Panel, QueryError, SkeletonRows } from '@/shared/ui'
 
 import {
@@ -97,6 +98,7 @@ export function PaymentOccurrences() {
     isEmpty: occurrences.length === 0,
   })
   const isRefetching = isFetching && content !== 'loading'
+  const showSkeleton = useShowSkeleton(content === 'loading')
 
   function resetFilter() {
     setFilter({})
@@ -127,7 +129,7 @@ export function PaymentOccurrences() {
             onRetry={refetch}
           />
         )}
-        {content === 'loading' && <SkeletonRows />}
+        {showSkeleton && <SkeletonRows />}
         {content === 'empty' && (
           <EmptyOccurrences isFiltered={isFiltered} onReset={resetFilter} />
         )}

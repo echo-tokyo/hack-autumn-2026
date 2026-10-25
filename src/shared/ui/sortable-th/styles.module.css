@@ -1,0 +1,25 @@
+.button {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  font: inherit;
+  color: inherit;
+  white-space: nowrap;
+}
+
+.button[data-align='right'] {
+  flex-direction: row-reverse;
+}
+
+.button svg {
+  opacity: 0.4;
+}
+
+.button:hover svg,
+.button[data-active='true'] svg {
+  opacity: 1;
+}
+
+.button[data-active='true'] {
+  color: var(--mantine-color-white);
+}

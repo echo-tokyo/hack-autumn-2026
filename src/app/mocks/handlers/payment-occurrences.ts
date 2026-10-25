@@ -3,6 +3,7 @@ import { delay, http, HttpResponse } from 'msw'
 import {
   ensureUpcomingOccurrences,
   occurrences,
+  occurrenceStatus,
   toOccurrenceDto,
 } from '../db/payments'
 import {
@@ -14,8 +15,8 @@ import {
 } from '../session'
 
 interface IUpdateOccurrenceBody {
-  isPaid: boolean
-  paymentDate?: string | null
+  is_paid: boolean
+  payment_date?: string | null
 }
 
 function findOccurrence(id: string | readonly string[] | undefined) {
@@ -35,8 +36,8 @@ export const paymentOccurrencesHandlers = [
     const currency = params.get('currency')
 
     const items = occurrences
+      .filter((item) => !status || occurrenceStatus(item) === status)
       .map(toOccurrenceDto)
-      .filter((item) => !status || item.status === status)
       .filter((item) => !currency || item.currency === currency)
       .sort((a, b) => b.dueDate.localeCompare(a.dueDate))
 
@@ -72,7 +73,8 @@ export const paymentOccurrencesHandlers = [
         return notFound('Период оплаты не найден')
       }
 
-      const { isPaid, paymentDate } = await request.json()
+      const { is_paid: isPaid, payment_date: paymentDate } =
+        await request.json()
       if (isPaid && !paymentDate) {
         return badRequest('Укажите фактическую дату оплаты')
       }
