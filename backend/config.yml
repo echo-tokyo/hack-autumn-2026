@@ -1,5 +1,5 @@
 db:
-  host: "127.0.0.1" # db host
+  host: "psql" # db host
   port: 5432 # db port
   logging:
     log_level: 2 # 2 - info, 3 - warn (default), 4 - error, 5 - silent
