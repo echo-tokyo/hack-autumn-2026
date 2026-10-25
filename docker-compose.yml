@@ -36,6 +36,9 @@ services:
     build:
       context: .
       dockerfile: ./web-server/Dockerfile
+      args:
+        VITE_API_BASE_URL: /api/v1
+        VITE_API_MOCKS: "false"
     container_name: keeper_webserver
     restart: always
     ports:

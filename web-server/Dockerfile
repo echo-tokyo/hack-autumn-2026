@@ -6,6 +6,11 @@ FROM node:current-alpine3.22 AS frontend
 
 WORKDIR /app/frontend
 
+ARG VITE_API_BASE_URL=/api/v1
+ARG VITE_API_MOCKS=false
+ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
+ENV VITE_API_MOCKS=$VITE_API_MOCKS
+
 # install requirements
 COPY ./frontend/package.json .
 RUN npm install
