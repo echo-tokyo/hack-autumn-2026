@@ -50,6 +50,5 @@ networks:
     driver: bridge
 
 volumes:
-  mysql_data:
-  redis_data:
-  media:
+  psql_data:
+    name: keeper_psql_data
