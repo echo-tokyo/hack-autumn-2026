@@ -5,6 +5,7 @@ export {
   useGetUsersQuery,
   useLoginMutation,
   useLogoutMutation,
+  userApi,
   useUpdateUserMutation,
 } from './api/user-api'
 export { getUserRoleLabel } from './lib/roles'

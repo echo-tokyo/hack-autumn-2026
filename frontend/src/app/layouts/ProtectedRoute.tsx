@@ -1,20 +1,18 @@
-import { Button, Center, Loader } from '@mantine/core'
+import { Button, Center } from '@mantine/core'
 import { Navigate, Outlet, useLocation } from 'react-router'
 
 import { useGetMeQuery } from '@/entities/user'
 import { ROUTES } from '@/shared/config'
 import { MessageScreen } from '@/shared/ui'
 
+import { AppLoader } from './AppLoader'
+
 export function ProtectedRoute() {
   const { data: user, error, isLoading, isFetching, refetch } = useGetMeQuery()
   const location = useLocation()
 
   if (isLoading) {
-    return (
-      <Center mih='100vh'>
-        <Loader />
-      </Center>
-    )
+    return <AppLoader />
   }
 
   if (user) {

@@ -16,7 +16,7 @@ import { Toaster } from 'sonner'
 import { cssVariablesResolver, theme } from '@/shared/config'
 
 import { store } from './model/store'
-import { router } from './routes/router'
+import { createAppRouter } from './routes/router'
 
 async function enableMocking() {
   if (import.meta.env.VITE_API_MOCKS !== 'true') {
@@ -33,6 +33,8 @@ if (!rootElement) {
 }
 
 await enableMocking()
+
+const router = createAppRouter()
 
 createRoot(rootElement).render(
   <StrictMode>

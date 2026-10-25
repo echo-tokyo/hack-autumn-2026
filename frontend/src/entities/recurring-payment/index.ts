@@ -1,4 +1,5 @@
 export {
+  recurringPaymentApi,
   useCreateRecurringPaymentMutation,
   useDeleteRecurringPaymentMutation,
   useGetRecurringPaymentsQuery,

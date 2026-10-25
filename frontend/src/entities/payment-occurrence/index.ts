@@ -1,4 +1,5 @@
 export {
+  paymentOccurrenceApi,
   useGetPaymentOccurrencesQuery,
   useUpdatePaymentOccurrenceMutation,
 } from './api/payment-occurrence-api'
