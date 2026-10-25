@@ -52,10 +52,15 @@ var (
 		CORS:            _defCORS,
 		Auth:            _defAuth,
 	}
+	_defTelegram = Telegram{
+		ReminderLeadDays: 3,
+		Interval:         24 * time.Hour,
+	}
 	_defApp = App{
 		TimezoneName: "UTC",
 		Logging:      _defLogging,
 		Server:       _defServer,
+		Telegram:     _defTelegram,
 	}
 	_defConfig = Config{
 		DB:  _defDB,
@@ -85,6 +90,7 @@ type (
 		Logging      `yaml:"logging"`
 		Server       `yaml:"server"`
 		Admin
+		Telegram
 	}
 
 	Logging struct {
@@ -133,6 +139,13 @@ type (
 		Username    string `env-required:"true" env:"ADMIN_USERNAME"`
 		PasswordRaw []byte `env-required:"true" env:"ADMIN_PASSWORD" json:"-"`
 		Password    []byte `json:"-"`
+	}
+
+	Telegram struct {
+		BotToken         string        `env-required:"true" env:"TELEGRAM_BOT_TOKEN"`
+		ChatID           int64         `env-required:"true" env:"TELEGRAM_CHAT_ID"`
+		ReminderLeadDays int           `yaml:"reminder_lead_days"`
+		Interval         time.Duration `yaml:"reminder_interval"`
 	}
 )
 

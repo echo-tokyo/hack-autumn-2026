@@ -12,11 +12,13 @@ import (
 	"syscall"
 
 	"backend/config"
+	"backend/internal/app/service/notifier"
 	"backend/internal/app/service/occurrence"
 	"backend/internal/app/service/server"
 	"backend/internal/pkg/cache"
 	"backend/internal/pkg/db"
 	"backend/internal/pkg/logger"
+	"backend/internal/pkg/telegram"
 	"backend/internal/pkg/validator"
 
 	"github.com/shopspring/decimal"
@@ -41,8 +43,8 @@ type App struct {
 	services []Service
 }
 
-// NewServer returns a new instance of [App] with services to start HTTP-server.
-func NewServer() (*App, error) {
+// NewApp returns a new instance of [App] with services to start HTTP-server.
+func NewApp() (*App, error) {
 	decimal.MarshalJSONWithoutQuotes = true
 
 	// load config
@@ -78,6 +80,11 @@ func NewServer() (*App, error) {
 	}
 	// init cache storage
 	cacheStorage := cache.NewInMem()
+	// init tg client
+	tgClient, err := telegram.New(cfg.Telegram.BotToken, cfg.Telegram.ChatID)
+	if err != nil {
+		return nil, fmt.Errorf("tg client: %w", err)
+	}
 
 	// init server service
 	srv, err := server.New(cfg, dbStorage, cacheStorage, valid)
@@ -86,10 +93,14 @@ func NewServer() (*App, error) {
 	}
 	// init occurrence service
 	occ := occurrence.New(cfg, dbStorage)
+	ntfy, err := notifier.New(cfg, dbStorage, tgClient)
+	if err != nil {
+		return nil, fmt.Errorf("create notify service: %w", err)
+	}
 
 	return &App{
 		cfg:      cfg,
-		services: []Service{srv, occ},
+		services: []Service{srv, occ, ntfy},
 	}, nil
 }
 
