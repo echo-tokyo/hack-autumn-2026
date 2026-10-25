@@ -161,7 +161,9 @@ func (s *Occurrence) ensureFor(
 			Amount:             rp.Amount,
 			Currency:           rp.Currency,
 			DueDate:            truncateToDateUTC(rp.StartDate),
-			IsNotified:         truncateToDateUTC(rp.StartDate).Before(today),
+			// IsNotified:         truncateToDateUTC(rp.StartDate).Before(today),
+			IsNotified: truncateToDateUTC(rp.StartDate).
+				Before(today.AddDate(0, 0, -s.cfg.Telegram.ReminderLeadDays)),
 		}
 		if err := s.occRepo.Create(first); err != nil &&
 			!errors.Is(err, occurrence.ErrAlreadyExists) {
@@ -192,7 +194,8 @@ func (s *Occurrence) ensureFor(
 		DueDate:            nextDue,
 		// If we are catching up (latest was far in the past), the next
 		// occurrence may also be in the past — don't remind about it.
-		IsNotified: nextDue.Before(today),
+		// IsNotified: nextDue.Before(today),
+		IsNotified: nextDue.Before(today.AddDate(0, 0, -s.cfg.Telegram.ReminderLeadDays)),
 	}
 
 	if err := s.occRepo.Create(occ); err != nil {

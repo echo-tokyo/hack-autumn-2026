@@ -14,7 +14,7 @@ func main() {
 		application *app.App
 	)
 
-	application, err = app.NewServer()
+	application, err = app.NewApp()
 	if err != nil {
 		fatal(err)
 	}
