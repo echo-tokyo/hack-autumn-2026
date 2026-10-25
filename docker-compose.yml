@@ -21,7 +21,7 @@ services:
       dockerfile: ./build/Dockerfile
     container_name: keeper_server
     restart: always
-    export:
+    expose:
       - "8080"
     env_file:
      - ./.env
