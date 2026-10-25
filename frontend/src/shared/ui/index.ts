@@ -1,3 +1,6 @@
+export { AnimatedAmount } from './animated-amount/AnimatedAmount'
+export { BrandPattern } from './brand-pattern/BrandPattern'
+export { BrandWatermark } from './brand-watermark/BrandWatermark'
 export { Logo } from './logo/Logo'
 export { MessageScreen } from './message-screen/MessageScreen'
 export { MonthCalendar } from './month-calendar/MonthCalendar'

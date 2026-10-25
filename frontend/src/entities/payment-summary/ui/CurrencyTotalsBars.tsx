@@ -7,9 +7,11 @@ import {
   Text,
   Tooltip,
 } from '@mantine/core'
+import { useEffect, useState } from 'react'
 
 import { CURRENCIES, type TCurrency } from '@/shared/config'
-import { formatAmount, formatMoney } from '@/shared/lib'
+import { formatMoney } from '@/shared/lib'
+import { AnimatedAmount } from '@/shared/ui'
 
 import type { ICurrencyTotals } from '../model/types'
 
@@ -20,14 +22,28 @@ const SEGMENTS = [
 ] as const
 
 const SWATCH_SIZE = 8
+const FILL_DURATION = 700
+
+let hasAppeared = false
 
 interface ICurrencyBarProps {
   totals: ICurrencyTotals
+  animateIn: boolean
 }
 
-function CurrencyBar({ totals }: ICurrencyBarProps) {
+function CurrencyBar({ totals, animateIn }: ICurrencyBarProps) {
   const sum = totals.paid + totals.overdue + totals.toPay
   const segments = SEGMENTS.filter((segment) => totals[segment.key] > 0)
+  const [isFilled, setIsFilled] = useState(!animateIn)
+
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => setIsFilled(true))
+    return () => cancelAnimationFrame(frame)
+  }, [])
+
+  function getSegmentWidth(amount: number) {
+    return isFilled ? (amount / sum) * 100 : 0
+  }
 
   return (
     <Stack gap='xs'>
@@ -36,7 +52,7 @@ function CurrencyBar({ totals }: ICurrencyBarProps) {
           {totals.currency}
         </Text>
         <Text fw={700}>
-          {formatAmount(totals.toPay)}{' '}
+          <AnimatedAmount value={totals.toPay} animateFromZero={animateIn} />{' '}
           <Text span c='dimmed' fz='sm' fw={400}>
             к оплате
           </Text>
@@ -47,6 +63,7 @@ function CurrencyBar({ totals }: ICurrencyBarProps) {
         size='lg'
         radius='xs'
         bg='var(--color-surface-3)'
+        transitionDuration={FILL_DURATION}
         aria-hidden
       >
         {segments.map((segment) => (
@@ -55,7 +72,7 @@ function CurrencyBar({ totals }: ICurrencyBarProps) {
             label={`${segment.label}: ${formatMoney(totals[segment.key], totals.currency)}`}
           >
             <Progress.Section
-              value={(totals[segment.key] / sum) * 100}
+              value={getSegmentWidth(totals[segment.key])}
               color={segment.color}
             />
           </Tooltip>
@@ -72,7 +89,11 @@ function CurrencyBar({ totals }: ICurrencyBarProps) {
           <Group key={segment.key} gap={6} wrap='nowrap'>
             <Box w={SWATCH_SIZE} h={SWATCH_SIZE} bg={segment.color} />
             <Text fz='sm' c='dimmed'>
-              {segment.label} {formatAmount(totals[segment.key])}
+              {segment.label}{' '}
+              <AnimatedAmount
+                value={totals[segment.key]}
+                animateFromZero={animateIn}
+              />
             </Text>
           </Group>
         ))}
@@ -100,10 +121,20 @@ interface ICurrencyTotalsBarsProps {
 }
 
 export function CurrencyTotalsBars({ totals }: ICurrencyTotalsBarsProps) {
+  const [isFirstAppearance] = useState(() => !hasAppeared)
+
+  useEffect(() => {
+    hasAppeared = true
+  }, [])
+
   return (
     <SimpleGrid cols={{ base: 1, md: 3 }} spacing='xl' verticalSpacing='lg'>
       {CURRENCIES.map((currency) => (
-        <CurrencyBar key={currency} totals={findTotals(totals, currency)} />
+        <CurrencyBar
+          key={currency}
+          totals={findTotals(totals, currency)}
+          animateIn={isFirstAppearance}
+        />
       ))}
     </SimpleGrid>
   )

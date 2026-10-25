@@ -1,0 +1,13 @@
+.watermark {
+  position: absolute;
+  right: -0.08em;
+  bottom: -0.28em;
+  font-family: var(--mantine-font-family-headings);
+  font-size: clamp(14rem, 32vw, 26rem);
+  font-weight: 900;
+  line-height: 1;
+  color: var(--color-accent);
+  pointer-events: none;
+  user-select: none;
+  opacity: 0.06;
+}
