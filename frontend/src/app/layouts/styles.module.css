@@ -11,7 +11,7 @@
   flex: 1;
   flex-direction: column;
   min-height: 0;
-  padding: var(--page-padding);
+  padding: var(--page-padding) var(--page-padding) 0;
   overflow-y: auto;
 }
 
@@ -32,6 +32,12 @@
   min-height: 0;
 }
 
+.page::after {
+  flex-shrink: 0;
+  height: var(--page-padding);
+  content: '';
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .page {
     animation: page-in 280ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
@@ -41,11 +47,9 @@
 @keyframes page-in {
   from {
     opacity: 0;
-    transform: translateY(8px);
   }
 
   to {
     opacity: 1;
-    transform: none;
   }
 }

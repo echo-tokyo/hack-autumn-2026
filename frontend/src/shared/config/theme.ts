@@ -146,7 +146,16 @@ export const theme = createTheme({
     PasswordInput: { defaultProps: { size: 'md' } },
     Select: { defaultProps: { size: 'md' } },
     NumberInput: { defaultProps: { size: 'md' } },
-    DatePickerInput: { defaultProps: { size: 'md' } },
+    DatePickerInput: {
+      defaultProps: {
+        size: 'md',
+        popoverProps: {
+          preventPositionChangeWhenVisible: false,
+          middlewares: { flip: true, shift: true, size: true },
+          styles: { dropdown: { overflowY: 'auto' } },
+        },
+      },
+    },
     InputWrapper: {
       styles: {
         label: {
