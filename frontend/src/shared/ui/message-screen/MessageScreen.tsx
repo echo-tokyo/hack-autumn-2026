@@ -10,16 +10,18 @@ interface IMessageScreenProps {
   title: string
   description: string
   action: ReactNode
+  withPattern?: boolean
 }
 
 export function MessageScreen({
   title,
   description,
   action,
+  withPattern = true,
 }: IMessageScreenProps) {
   return (
     <SimpleGrid
-      cols={{ base: 1, md: 2 }}
+      cols={{ base: 1, md: withPattern ? 2 : 1 }}
       spacing='xl'
       maw={SCREEN_MAX_WIDTH}
       w='100%'
@@ -29,9 +31,11 @@ export function MessageScreen({
         <Text c='dimmed'>{description}</Text>
         {action}
       </Stack>
-      <div className={styles.art}>
-        <BrandPattern />
-      </div>
+      {withPattern && (
+        <div className={styles.art}>
+          <BrandPattern />
+        </div>
+      )}
     </SimpleGrid>
   )
 }
