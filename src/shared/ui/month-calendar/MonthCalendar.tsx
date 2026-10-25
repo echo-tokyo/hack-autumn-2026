@@ -2,7 +2,7 @@ import { ActionIcon, Button, Group, Text, Title } from '@mantine/core'
 import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react'
 import { type ReactNode, useState } from 'react'
 
-import { ICON_SIZE } from '@/shared/config'
+import { ICON_SIZE, ICON_STROKE } from '@/shared/config'
 import {
   formatMonthTitle,
   getMonthDays,
@@ -60,7 +60,7 @@ export function MonthCalendar({
             aria-label='Предыдущий месяц'
             onClick={showPreviousMonth}
           >
-            <IconChevronLeft size={ICON_SIZE} />
+            <IconChevronLeft size={ICON_SIZE} stroke={ICON_STROKE} />
           </ActionIcon>
           <ActionIcon
             variant='secondary'
@@ -68,7 +68,7 @@ export function MonthCalendar({
             aria-label='Следующий месяц'
             onClick={showNextMonth}
           >
-            <IconChevronRight size={ICON_SIZE} />
+            <IconChevronRight size={ICON_SIZE} stroke={ICON_STROKE} />
           </ActionIcon>
           <Title order={2} ml='xs'>
             {formatMonthTitle(month)}

@@ -1,11 +1,12 @@
 import { Table, type TableThProps, UnstyledButton } from '@mantine/core'
 import {
-  IconCaretDownFilled,
-  IconCaretUpDownFilled,
-  IconCaretUpFilled,
+  IconChevronDown,
+  IconChevronUp,
+  IconSelector,
 } from '@tabler/icons-react'
 import type { ReactNode } from 'react'
 
+import { ICON_STROKE } from '@/shared/config'
 import type { TSortDirection } from '@/shared/lib'
 
 import styles from './styles.module.css'
@@ -29,12 +30,12 @@ interface ISortIconProps {
 
 function SortIcon({ direction }: ISortIconProps) {
   if (direction === 'asc') {
-    return <IconCaretUpFilled size={SORT_ICON_SIZE} />
+    return <IconChevronUp size={SORT_ICON_SIZE} stroke={ICON_STROKE} />
   }
   if (direction === 'desc') {
-    return <IconCaretDownFilled size={SORT_ICON_SIZE} />
+    return <IconChevronDown size={SORT_ICON_SIZE} stroke={ICON_STROKE} />
   }
-  return <IconCaretUpDownFilled size={SORT_ICON_SIZE} />
+  return <IconSelector size={SORT_ICON_SIZE} stroke={ICON_STROKE} />
 }
 
 export function SortableTh({

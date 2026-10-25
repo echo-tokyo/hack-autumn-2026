@@ -1,9 +1,9 @@
 import {
   type Icon,
-  IconLayoutDashboardFilled,
-  IconListDetailsFilled,
-  IconReceiptFilled,
-  IconUserFilled,
+  IconCalendarDollar,
+  IconLayoutDashboard,
+  IconRepeat,
+  IconUsers,
 } from '@tabler/icons-react'
 
 import { ROUTES } from '@/shared/config'
@@ -28,12 +28,12 @@ export const NAV_GROUPS: INavGroup[] = [
       {
         label: 'Сводка',
         to: ROUTES.payments,
-        icon: IconLayoutDashboardFilled,
+        icon: IconLayoutDashboard,
       },
       {
         label: 'Периоды оплат',
         to: ROUTES.occurrences,
-        icon: IconListDetailsFilled,
+        icon: IconCalendarDollar,
       },
     ],
   },
@@ -44,9 +44,9 @@ export const NAV_GROUPS: INavGroup[] = [
       {
         label: 'Регулярные платежи',
         to: ROUTES.recurringPayments,
-        icon: IconReceiptFilled,
+        icon: IconRepeat,
       },
-      { label: 'Пользователи', to: ROUTES.users, icon: IconUserFilled },
+      { label: 'Пользователи', to: ROUTES.users, icon: IconUsers },
     ],
   },
 ]

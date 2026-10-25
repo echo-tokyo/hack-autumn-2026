@@ -7,13 +7,13 @@ import {
   Title,
   Tooltip,
 } from '@mantine/core'
-import { IconInfoSquareRoundedFilled } from '@tabler/icons-react'
+import { IconInfoCircle } from '@tabler/icons-react'
 
 import {
   CurrencyTotalsBars,
   useGetPaymentsSummaryQuery,
 } from '@/entities/payment-summary'
-import { ICON_SIZE } from '@/shared/config'
+import { ICON_SIZE, ICON_STROKE } from '@/shared/config'
 import { useShowSkeleton } from '@/shared/lib'
 import { Panel, QueryError } from '@/shared/ui'
 
@@ -31,7 +31,7 @@ export function PaymentsSummary() {
         <Title order={2}>Итоги по валютам</Title>
         <Tooltip label={HINT} multiline w={240} withArrow>
           <ActionIcon variant='subtle' color='gray' aria-label={HINT}>
-            <IconInfoSquareRoundedFilled size={ICON_SIZE} />
+            <IconInfoCircle size={ICON_SIZE} stroke={ICON_STROKE} />
           </ActionIcon>
         </Tooltip>
       </Group>
