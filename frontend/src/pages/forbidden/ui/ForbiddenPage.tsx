@@ -8,7 +8,6 @@ export function ForbiddenPage() {
   return (
     <MessageScreen
       title='Нет доступа'
-      withPattern={false}
       description='Этот раздел доступен только администратору. Вы можете смотреть платежи и отмечать оплату.'
       action={
         <Button component={Link} to={ROUTES.payments}>
