@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -9,7 +10,10 @@ import (
 	"backend/internal/app/entity"
 	occurrence "backend/internal/app/payment_occurrence"
 	payment "backend/internal/app/recurring_payment"
+	utilstime "backend/internal/pkg/utils/time"
 )
+
+const _maxBackfillOccurrences = 120
 
 // Ensure UCAdminClient implements both usecase interfaces.
 var _ payment.UsecaseAdmin = (*UCAdminClient)(nil)
@@ -48,27 +52,25 @@ func (u *UCAdminClient) Create(rp *entity.RecurringPayment) error {
 	if err := validateRecurringPayment(rp); err != nil {
 		return fmt.Errorf("validate: %w", err)
 	}
+
 	if err := u.repo.Create(rp); err != nil {
 		return fmt.Errorf("create recurring payment: %w", err)
 	}
 
-	occ := &entity.PaymentOccurrence{
-		RecurringPaymentID: rp.ID,
-		Amount:             rp.Amount,
-		Currency:           rp.Currency,
-		DueDate:            truncateToDateUTC(rp.StartDate),
-		IsPaid:             false,
-		IsNotified:         false,
+	today, err := u.today()
+	if err != nil {
+		_ = u.repo.SoftDelete(rp.ID)
+		return fmt.Errorf("resolve today: %w", err)
 	}
-	if err := u.occRepo.Create(occ); err != nil {
-		if delErr := u.repo.SoftDelete(rp.ID); delErr != nil {
-			return fmt.Errorf(
-				"create first occurrence: %w (compensation failed: %v)",
-				err, delErr,
-			)
-		}
-		return fmt.Errorf("create first occurrence: %w", err)
+
+	if err := u.createInitialOccurrences(rp, today); err != nil {
+		// compensation: hide the orphan recurring payment.
+		// Created occurrences stay in DB as history, but they are not
+		// visible because List filters by is_deleted = false.
+		_ = u.repo.SoftDelete(rp.ID)
+		return fmt.Errorf("create initial occurrences: %w", err)
 	}
+
 	return nil
 }
 
@@ -110,4 +112,52 @@ func validateRecurringPayment(rp *entity.RecurringPayment) error {
 // truncateToDateUTC returns date-only time in UTC.
 func truncateToDateUTC(t time.Time) time.Time {
 	return time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, time.UTC)
+}
+
+// createInitialOccurrences creates:
+// - all occurrences with due_date < today (backfill: overdue periods);
+// - one occurrence with due_date >= today (current upcoming period).
+func (u *UCAdminClient) createInitialOccurrences(
+	rp *entity.RecurringPayment,
+	today time.Time,
+) error {
+	due := truncateToDateUTC(rp.StartDate)
+
+	for i := 0; i < _maxBackfillOccurrences; i++ {
+		isCurrent := !due.Before(today) // due >= today
+
+		occ := &entity.PaymentOccurrence{
+			RecurringPaymentID: rp.ID,
+			Amount:             rp.Amount,
+			Currency:           rp.Currency,
+			DueDate:            due,
+			// Historical (past) occurrences are not to be reminded about.
+			IsNotified: due.Before(today),
+		}
+
+		if err := u.occRepo.Create(occ); err != nil {
+			if !errors.Is(err, occurrence.ErrAlreadyExists) {
+				return fmt.Errorf(
+					"create occurrence due %s: %w",
+					due.Format("2006-01-02"), err,
+				)
+			}
+			// already exists — fine (race or re-run), advance and continue.
+		}
+		if isCurrent {
+			return nil
+		}
+		due = utilstime.ComputeNextDueDate(int(rp.BillingDay), due)
+	}
+	return fmt.Errorf(
+		"%w: backfill limit %d exceeded (start_date too far in the past)",
+		payment.ErrInvalidArgument, _maxBackfillOccurrences,
+	)
+}
+
+// today returns current date (00:00:00 UTC) in configured timezone,
+// normalized to UTC midnight so that DATE comparisons are exact.
+func (u *UCAdminClient) today() (time.Time, error) {
+	now := time.Now().In(u.cfg.Timezone)
+	return time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.UTC), nil
 }
