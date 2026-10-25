@@ -15,7 +15,7 @@ export function MainLayout() {
   return (
     <AppShell
       withBorder={false}
-      padding='md'
+      padding={{ base: 'xs', sm: 'md' }}
       header={{ height: { base: MOBILE_HEADER_HEIGHT, sm: 0 } }}
       navbar={{
         width: NAVBAR_WIDTH,

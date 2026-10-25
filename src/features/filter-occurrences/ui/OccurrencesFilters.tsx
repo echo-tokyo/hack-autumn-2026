@@ -6,6 +6,8 @@ import type {
 } from '@/entities/payment-occurrence'
 import { CURRENCIES, type TCurrency } from '@/shared/config'
 
+import styles from './styles.module.css'
+
 const ALL_STATUSES = 'all'
 
 const STATUS_OPTIONS: {
@@ -36,13 +38,15 @@ export function OccurrencesFilters({
   }
 
   return (
-    <Group gap='md'>
-      <SegmentedControl
-        data={STATUS_OPTIONS}
-        value={filter.status ?? ALL_STATUSES}
-        onChange={handleStatusChange}
-        aria-label='Статус'
-      />
+    <Group gap='md' maw='100%'>
+      <div className={styles.statusScroll}>
+        <SegmentedControl
+          data={STATUS_OPTIONS}
+          value={filter.status ?? ALL_STATUSES}
+          onChange={handleStatusChange}
+          aria-label='Статус'
+        />
+      </div>
       <Select
         data={[...CURRENCIES]}
         value={filter.currency ?? null}

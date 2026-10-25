@@ -22,7 +22,7 @@ export function OccurrenceGroup({
         {title}
         {count !== undefined && ` (${count})`}
       </Title>
-      <Panel px='lg' py='xs'>
+      <Panel px={{ base: 'md', sm: 'lg' }} py='xs'>
         <div className={styles.list}>{children}</div>
       </Panel>
     </Stack>
