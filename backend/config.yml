@@ -1,12 +1,12 @@
 db:
-  host: "127.0.0.1" # db host
+  host: "psql" # "127.0.0.1" # db host
   port: 5432 # db port
   logging:
     log_level: 2 # 2 - info, 3 - warn (default), 4 - error, 5 - silent
 
 app:
   logging:
-    log_level: 1 # 1 - debug, 2 - info (default), 3 - warn, 4 - error, 5 - silent
+    log_level: 2 # 1 - debug, 2 - info (default), 3 - warn, 4 - error, 5 - silent
     log_format: "json" # ("json", "text") set log format
   server:
     port: 8080 # port for HTTP-server
