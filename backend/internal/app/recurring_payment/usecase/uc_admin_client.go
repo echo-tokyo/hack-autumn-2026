@@ -132,7 +132,7 @@ func (u *UCAdminClient) createInitialOccurrences(
 			Currency:           rp.Currency,
 			DueDate:            due,
 			// Historical (past) occurrences are not to be reminded about.
-			IsNotified: due.Before(today.AddDate(0, 0, -u.cfg.Telegram.ReminderLeadDays)),
+			IsNotified: due.Before(today),
 		}
 
 		if err := u.occRepo.Create(occ); err != nil {
