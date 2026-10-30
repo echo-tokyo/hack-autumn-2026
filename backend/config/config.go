@@ -30,11 +30,11 @@ var (
 		SameSite: "",
 	}
 	_defAccessToken = AccessToken{
-		TTL:    30 * time.Minute, // default access token ttl (30 minutes)
+		TTL:    30 * time.Minute, //nolint:mnd // default access token ttl (30 minutes)
 		Cookie: _defCookie,
 	}
 	_defRefreshToken = RefreshToken{
-		TTL:    24 * time.Hour, // default access token ttl (1 day)
+		TTL:    24 * time.Hour, //nolint:mnd // default access token ttl (1 day)
 		Cookie: _defCookie,
 	}
 	_defAuth = Auth{

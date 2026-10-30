@@ -16,8 +16,6 @@ type PaymentOccurrence struct {
 	DueDate     time.Time       `json:"dueDate"`
 	IsPaid      bool            `json:"isPaid"`
 	PaymentDate *time.Time      `json:"paymentDate"`
-	IsNotified  bool            `json:"isNotified"`
-	NotifiedAt  *time.Time      `json:"notifiedAt"`
 	CreatedAt   time.Time       `json:"createdAt"`
 	UpdatedAt   time.Time       `json:"updatedAt"`
 

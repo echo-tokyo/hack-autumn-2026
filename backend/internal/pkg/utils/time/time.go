@@ -2,29 +2,33 @@ package time
 
 import "time"
 
-// ComputeNextDueDate returns the next due date after 'from' for a payment
-// that bills on 'billingDay' each month.
-func ComputeNextDueDate(billingDay int, from time.Time) time.Time {
-	if billingDay < 1 {
-		billingDay = 1
+const (
+	_daysInMonth  = 31
+	_monthsInYear = 12
+)
+
+// ComputeNextDeadline returns the next deadline date after 'from'
+// that happens on 'deadlineDay' each month.
+func ComputeNextDeadline(deadlineDay int, from time.Time) time.Time {
+	if deadlineDay < 1 {
+		deadlineDay = 1
 	}
-	if billingDay > 31 {
-		billingDay = 31
+	if deadlineDay > _daysInMonth {
+		deadlineDay = _daysInMonth
 	}
 
 	year, month, _ := from.Date()
 
 	nextMonth := month + 1
 	nextYear := year
-	if nextMonth > 12 {
+	if nextMonth > _monthsInYear {
 		nextMonth = 1
 		nextYear++
 	}
 
 	// Last day of the target month.
 	lastDay := time.Date(nextYear, nextMonth+1, 0, 0, 0, 0, 0, time.UTC).Day()
-
-	actualDay := min(billingDay, lastDay)
+	actualDay := min(deadlineDay, lastDay)
 
 	return time.Date(nextYear, nextMonth, actualDay, 0, 0, 0, 0, time.UTC)
 }

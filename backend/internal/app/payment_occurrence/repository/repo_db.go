@@ -149,8 +149,6 @@ func (r *RepoDB) Update(occ *entity.PaymentOccurrence) error {
 		Updates(map[string]any{
 			"is_paid":      occ.IsPaid,
 			"payment_date": occ.PaymentDate,
-			"is_notified":  occ.IsNotified,
-			"notified_at":  occ.NotifiedAt,
 		})
 
 	if result.Error != nil {

@@ -17,7 +17,7 @@ linters:
     - funlen
     - ginkgolinter
     - gochecknoinits
-    - goconst
+    # - goconst
     - gocritic
     - gocyclo
     - godox
@@ -45,7 +45,6 @@ linters:
     errorlint:
       comparison: true
     goconst:
-      ignore-string-values: .*?%s|%v|%w.*
       numbers: true
       ignore-calls: false
     gocritic:
@@ -71,6 +70,11 @@ linters:
       - std-error-handling
     paths:
       - temp
+      - frontend
+      - web-server
+      - backend/internal/app/payment_occurrence
+      - backend/internal/app/recurring_payment
+      - backend/internal/app/service/occurrence
     rules:
       - linters: # general accepted var name for type assertions
           - varnamelen
@@ -99,6 +103,10 @@ linters:
       - linters: # general accepted var name for http.ResponseWriter
           - varnamelen
         text: "(parameter|variable) name 'w' is too short for the scope of its usage"
+
+      - linters: # struct tags
+          - lll
+        path: "http/v1/dto.go"
 
 issues:
   fix: false

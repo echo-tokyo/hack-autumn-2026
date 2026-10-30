@@ -26,7 +26,7 @@ func CustomErrorHandler(ctx *fiber.Ctx, err error) error {
 		errCode = fiberErr.Code
 		switch fiberErr.Code {
 		case fiber.StatusNotFound:
-			errMsg = "запись не найдена"
+			errMsg = fiberErr.Message
 			errLog = false
 		case fiber.StatusForbidden:
 			errMsg = "запрещено"

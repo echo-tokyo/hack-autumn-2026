@@ -13,7 +13,7 @@ import (
 	paymentuc "backend/internal/app/recurring_payment/usecase"
 	"backend/internal/app/service/server/middleware"
 	userhttpv1 "backend/internal/app/user/controller/http/v1"
-	userrepo "backend/internal/app/user/repository"
+	userrepo "backend/internal/app/user/repo"
 	useruc "backend/internal/app/user/usecase"
 	"backend/internal/pkg/cache"
 	"backend/internal/pkg/db"
@@ -25,8 +25,8 @@ func (s *Server) registerEndpointsV1(cfg *config.Config, dbStorage *db.DB,
 	cacheStorage cache.Storage, valid validator.Validator) {
 
 	// create repos
-	authRepoCache := authrepo.NewRepoCache(cfg, cacheStorage)
-	userRepoDB := userrepo.NewRepoDB(cfg, dbStorage)
+	authRepoCache := authrepo.NewCache(cfg, cacheStorage)
+	userRepoDB := userrepo.NewDB(cfg, dbStorage)
 	rpRepo := paymentrepo.NewRepoDB(dbStorage)
 	occRepo := occurrencerepo.NewRepoDB(dbStorage)
 

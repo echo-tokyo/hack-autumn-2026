@@ -76,11 +76,6 @@ func JWTRefresh(cfg *config.Config, authUC auth.UsecaseMiddleware) fiber.Handler
 		// check token is blacklisted
 		err = authUC.BlockIfBlacklist(token)
 		if errors.Is(err, auth.ErrForbidden) {
-			// return errhandler.CustomErrorHandler(ctx, &httperror.HTTPError{
-			// 	CauseErr:   err,
-			// 	StatusCode: fiber.StatusForbidden,
-			// 	Message:    err.Error(),
-			// })
 			return fiber.NewError(fiber.StatusForbidden, err.Error())
 		}
 		if err != nil {

@@ -161,7 +161,6 @@ func (s *Occurrence) ensureFor(
 			Amount:             rp.Amount,
 			Currency:           rp.Currency,
 			DueDate:            truncateToDateUTC(rp.StartDate),
-			IsNotified:         truncateToDateUTC(rp.StartDate).Before(today),
 		}
 		if err := s.occRepo.Create(first); err != nil &&
 			!errors.Is(err, occurrence.ErrAlreadyExists) {
@@ -183,16 +182,13 @@ func (s *Occurrence) ensureFor(
 		return nil
 	}
 
-	nextDue := utilstime.ComputeNextDueDate(int(rp.BillingDay), latestDue)
+	nextDue := utilstime.ComputeNextDeadline(int(rp.BillingDay), latestDue)
 
 	occ := &entity.PaymentOccurrence{
 		RecurringPaymentID: rp.ID,
 		Amount:             rp.Amount,
 		Currency:           rp.Currency,
 		DueDate:            nextDue,
-		// If we are catching up (latest was far in the past), the next
-		// occurrence may also be in the past — don't remind about it.
-		IsNotified: nextDue.Before(today),
 	}
 
 	if err := s.occRepo.Create(occ); err != nil {

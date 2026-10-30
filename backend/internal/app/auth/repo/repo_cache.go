@@ -14,26 +14,26 @@ const _blacklistPrefix = "token:blacklisted:" // key prefix for blacklisted toke
 
 var _blacklisted = []byte("1") // value for blacklisted tokens
 
-// Ensure RepoCache implements interface.
-var _ auth.RepositoryCache = (*RepoCache)(nil)
+// Ensure Cache implements interface.
+var _ auth.RepositoryCache = (*Cache)(nil)
 
-// RepoCache is an auth cache repo.
-// It implements the [auth.RepoCache] interface.
-type RepoCache struct {
+// Cache is an auth cache repo.
+// It implements the [auth.Cache] interface.
+type Cache struct {
 	cfg          *config.Config
 	cacheStorage cache.Storage
 }
 
-// NewRepoCache returns a new instance of [RepoCache].
-func NewRepoCache(cfg *config.Config, cacheStorage cache.Storage) *RepoCache {
-	return &RepoCache{
+// NewCache returns a new instance of [Cache].
+func NewCache(cfg *config.Config, cacheStorage cache.Storage) *Cache {
+	return &Cache{
 		cfg:          cfg,
 		cacheStorage: cacheStorage,
 	}
 }
 
 // Set token to blacklist expiring after exp duration.
-func (r *RepoCache) SetTokenToBlacklist(token string, exp time.Duration) error {
+func (r *Cache) SetTokenToBlacklist(token string, exp time.Duration) error {
 	err := r.cacheStorage.Set(_blacklistPrefix+token, _blacklisted, exp)
 	if err != nil {
 		return fmt.Errorf("set to cache: %w", err)
@@ -42,7 +42,7 @@ func (r *RepoCache) SetTokenToBlacklist(token string, exp time.Duration) error {
 }
 
 // TokenIsBlacklisted returns true, if given token is blacklisted.
-func (r *RepoCache) TokenIsBlacklisted(token string) (bool, error) {
+func (r *Cache) TokenIsBlacklisted(token string) (bool, error) {
 	val, err := r.cacheStorage.Get(_blacklistPrefix + token)
 	if err != nil && !errors.Is(err, cache.ErrNotFound) {
 		return false, fmt.Errorf("get from cache: %w", err)

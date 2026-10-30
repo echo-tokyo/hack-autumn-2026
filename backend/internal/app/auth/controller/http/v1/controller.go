@@ -109,7 +109,7 @@ func (c *AuthController) Obtain(ctx *fiber.Ctx) error {
 // @security		JWTRefresh
 // @success		204	"No Content"
 // @failure		401	"неверный токен (пустой, истекший или неверный формат)"
-// @failure		403	"токен в черном списке"
+// @failure		403	"запрещено (токен в черном списке)"
 func (c *AuthController) LogOut(ctx *fiber.Ctx) error {
 	// parse access token
 	token := utilsjwt.ParseTokenStringFromRequest(ctx)

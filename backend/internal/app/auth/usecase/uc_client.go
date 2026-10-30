@@ -46,7 +46,7 @@ func (u *UCClient) LogIn(username string, passwd []byte) (*entity.UserWithToken,
 	var userObj *entity.User
 
 	admin := u.userRepoDB.Admin()
-	if username == admin.Username {
+	if username == admin.Username { //nolint:nestif // little block
 		// check entered password is correct
 		if !password.IsCorrect(passwd, admin.Password) {
 			return nil, auth.ErrInvalidPassword

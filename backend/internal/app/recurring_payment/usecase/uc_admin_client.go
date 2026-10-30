@@ -131,8 +131,6 @@ func (u *UCAdminClient) createInitialOccurrences(
 			Amount:             rp.Amount,
 			Currency:           rp.Currency,
 			DueDate:            due,
-			// Historical (past) occurrences are not to be reminded about.
-			IsNotified: due.Before(today),
 		}
 
 		if err := u.occRepo.Create(occ); err != nil {
@@ -147,7 +145,7 @@ func (u *UCAdminClient) createInitialOccurrences(
 		if isCurrent {
 			return nil
 		}
-		due = utilstime.ComputeNextDueDate(int(rp.BillingDay), due)
+		due = utilstime.ComputeNextDeadline(int(rp.BillingDay), due)
 	}
 	return fmt.Errorf(
 		"%w: backfill limit %d exceeded (start_date too far in the past)",

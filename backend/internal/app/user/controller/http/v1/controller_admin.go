@@ -28,7 +28,7 @@ func NewControllerAdmin(userUCAdmin user.UsecaseAdmin,
 }
 
 // @summary		Создание нового юзера. [Только админ]
-// @description	Создание нового юзера и профиля для него со всеми данными.
+// @description	Создание нового юзера.
 // @router			/users [post]
 // @id				users-create
 // @tags			users
@@ -42,13 +42,14 @@ func NewControllerAdmin(userUCAdmin user.UsecaseAdmin,
 // @failure		409			"пользователь с введенным логином уже существует"
 func (c *UserControllerAdmin) Create(ctx *fiber.Ctx) error {
 	inputBody := &userBody{}
-	if err := serialize.Deserialize(inputBody, ctx.BodyParser, c.valid.Validate); err != nil {
+	err := serialize.Deserialize(inputBody, ctx.BodyParser, inputBody.Validate(c.valid))
+	if err != nil {
 		return err
 	}
-	userObj := inputBody.ToEntityUser()
+	userObj := inputBody.ToEntity()
 
 	// create a new user
-	err := c.userUCAdmin.Create(userObj)
+	err = c.userUCAdmin.Create(userObj)
 	if errors.Is(err, user.ErrAlreadyExists) {
 		return fiber.NewError(fiber.StatusConflict,
 			"пользователь с введенным логином уже существует")
@@ -89,7 +90,7 @@ func (c *UserControllerAdmin) Read(ctx *fiber.Ctx) error {
 }
 
 // @summary		Обновление юзера по id. [Только админ]
-// @description	Полное обновление профиля юзера, его группы (если студент) и пароля (опционально) по его id.
+// @description	Частичное обновление юзера по его id.
 // @router			/users/{id} [patch]
 // @id				users-update
 // @tags			users
@@ -108,13 +109,13 @@ func (c *UserControllerAdmin) Update(ctx *fiber.Ctx) error {
 		return err
 	}
 	inputBody := &updateBody{}
-	if err := serialize.Deserialize(inputBody, ctx.BodyParser, c.valid.Validate); err != nil {
+	err := serialize.Deserialize(inputBody, ctx.BodyParser, inputBody.Validate(c.valid))
+	if err != nil {
 		return err
 	}
-	updateData := inputBody.ToEntityUser()
 
 	// update user
-	newUser, err := c.userUCAdmin.Update(inputPath.ID, updateData)
+	newUser, err := c.userUCAdmin.Update(inputPath.ID, inputBody.ToEntity())
 	if errors.Is(err, user.ErrNotFound) {
 		return fiber.NewError(fiber.StatusNotFound,
 			"пользователь не найден")

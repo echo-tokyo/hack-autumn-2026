@@ -13,7 +13,7 @@ type RepositoryDB interface {
 	GetByID(id int) (*entity.User, error)
 	// GetByUsername returns user by given username.
 	GetByUsername(username string) (*entity.User, error)
-	// Update updates old user data to new one (by data ID).
+	// UpdateUser saves new user data (by data ID).
 	Update(data *entity.User) error
 	// Delete deletes user object (by data ID).
 	Delete(data *entity.User) error

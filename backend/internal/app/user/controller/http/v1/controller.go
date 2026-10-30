@@ -27,7 +27,7 @@ func NewController(userUCClient user.UsecaseClient,
 }
 
 // @summary		Получение информации о себе.
-// @description	Получение всей информации о себе (юзер, профиль).
+// @description	Получение всей информации о себе.
 // @router			/auth/me [get]
 // @id				auth-me-get
 // @tags			auth
