@@ -1,6 +1,9 @@
 package user
 
-import "backend/internal/app/entity"
+import (
+	"backend/internal/app/entity"
+	"context"
+)
 
 // RepositoryDB describes all DB methods for user.
 type RepositoryDB interface {
@@ -8,15 +11,20 @@ type RepositoryDB interface {
 	Admin() *entity.User
 
 	// Create creates a new user.
-	Create(userObj *entity.User) error
+	Create(ctx context.Context, userObj *entity.User) error
+
 	// GetByID returns user by given ID.
-	GetByID(id int) (*entity.User, error)
+	GetByID(ctx context.Context, id int) (*entity.User, error)
+
 	// GetByUsername returns user by given username.
-	GetByUsername(username string) (*entity.User, error)
+	GetByUsername(ctx context.Context, username string) (*entity.User, error)
+
 	// UpdateUser saves new user data (by data ID).
-	Update(data *entity.User) error
+	Update(ctx context.Context, data *entity.User) error
+
 	// Delete deletes user object (by data ID).
-	Delete(data *entity.User) error
+	Delete(ctx context.Context, data *entity.User) error
+
 	// GetAll returns all users.
-	GetAll() ([]entity.User, error)
+	GetAll(ctx context.Context) ([]entity.User, error)
 }

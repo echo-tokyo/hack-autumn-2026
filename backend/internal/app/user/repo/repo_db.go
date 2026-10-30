@@ -2,6 +2,7 @@
 package repo
 
 import (
+	"context"
 	"errors"
 	"fmt"
 
@@ -11,6 +12,7 @@ import (
 	"backend/internal/app/entity"
 	"backend/internal/app/user"
 	"backend/internal/pkg/db"
+	"backend/internal/pkg/db/transaction"
 )
 
 // Ensure DB implements interface.
@@ -42,8 +44,10 @@ func (r *DB) Admin() *entity.User {
 }
 
 // CreateUser creates a new user.
-func (r *DB) Create(userObj *entity.User) error {
-	err := r.dbStorage.Create(userObj).Error
+func (r *DB) Create(ctx context.Context, userObj *entity.User) error {
+	tx := transaction.DB(ctx, r.dbStorage.DB)
+
+	err := tx.Create(userObj).Error
 	if errors.Is(err, gorm.ErrDuplicatedKey) {
 		// user with such username already exists
 		return fmt.Errorf("user with username: %w: %s", user.ErrAlreadyExists, err.Error())
@@ -52,38 +56,41 @@ func (r *DB) Create(userObj *entity.User) error {
 }
 
 // GetByID returns user by given id.
-func (r *DB) GetByID(id int) (*entity.User, error) {
-	return r.getBy("id", id)
+func (r *DB) GetByID(ctx context.Context, id int) (*entity.User, error) {
+	return r.getBy(ctx, "id", id)
 }
 
 // GetByUsername returns user by given username.
-func (r *DB) GetByUsername(username string) (*entity.User, error) {
-	return r.getBy("username", username)
+func (r *DB) GetByUsername(ctx context.Context, username string) (*entity.User, error) {
+	return r.getBy(ctx, "username", username)
 }
 
 // UpdateUser saves new user data (by data ID).
-func (r *DB) Update(data *entity.User) error {
-	// update user
-	err := r.dbStorage.Model(&entity.User{}).
+func (r *DB) Update(ctx context.Context, data *entity.User) error {
+	tx := transaction.DB(ctx, r.dbStorage.DB)
+
+	err := tx.Model(&entity.User{}).
 		Where("id = ?", data.ID).
 		Save(data).Error
 	return err // err OR nil
 }
 
 // Delete deletes user object (by data ID).
-func (r *DB) Delete(data *entity.User) error {
-	if err := r.dbStorage.Delete(&entity.User{}, data.ID).Error; err != nil {
+func (r *DB) Delete(ctx context.Context, data *entity.User) error {
+	tx := transaction.DB(ctx, r.dbStorage.DB)
+	if err := tx.Delete(&entity.User{}, data.ID).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
 // GetAll returns all users.
-func (r *DB) GetAll() ([]entity.User, error) {
+func (r *DB) GetAll(ctx context.Context) ([]entity.User, error) {
+	tx := transaction.DB(ctx, r.dbStorage.DB)
 	var userList []entity.User
+
 	// create query
-	query := r.dbStorage.
-		Model(&entity.User{}).
+	query := tx.Model(&entity.User{}).
 		Order("id DESC")
 	// execute query
 	if err := query.Find(&userList).Error; err != nil {
@@ -93,9 +100,11 @@ func (r *DB) GetAll() ([]entity.User, error) {
 }
 
 // getBy returns user by given field filter.
-func (r *DB) getBy(field string, value any) (*entity.User, error) {
+func (r *DB) getBy(ctx context.Context, field string, value any) (*entity.User, error) {
+	tx := transaction.DB(ctx, r.dbStorage.DB)
+
 	var userObj entity.User
-	err := r.dbStorage.Where(field+" = ?", value).
+	err := tx.Where(field+" = ?", value).
 		First(&userObj).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		// user object not found

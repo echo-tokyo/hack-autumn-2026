@@ -3,6 +3,7 @@
 package usecase
 
 import (
+	"context"
 	"fmt"
 
 	"backend/config"
@@ -44,7 +45,7 @@ func (u *UCAdminClient) Create(userObj *entity.User) error {
 	if err != nil {
 		return fmt.Errorf("encode password: %w", err)
 	}
-	if err := u.userRepoDB.Create(userObj); err != nil {
+	if err := u.userRepoDB.Create(context.Background(), userObj); err != nil {
 		return fmt.Errorf("create: %w", err)
 	}
 	return nil
@@ -52,7 +53,7 @@ func (u *UCAdminClient) Create(userObj *entity.User) error {
 
 // GetByID returns user object by given ID.
 func (u *UCAdminClient) GetByID(id int) (*entity.User, error) {
-	userObj, err := u.userRepoDB.GetByID(id)
+	userObj, err := u.userRepoDB.GetByID(context.Background(), id)
 	if err != nil {
 		return nil, fmt.Errorf("get by id: %w", err)
 	}
@@ -62,7 +63,7 @@ func (u *UCAdminClient) GetByID(id int) (*entity.User, error) {
 // Update updates user by given ID with given data.
 // It returns user object with updated user data.
 func (u *UCAdminClient) Update(id int, data *entity.UserUpdate) (*entity.User, error) {
-	userObj, err := u.userRepoDB.GetByID(id)
+	userObj, err := u.userRepoDB.GetByID(context.Background(), id)
 	if err != nil {
 		return nil, fmt.Errorf("get by id: %w", err)
 	}
@@ -76,7 +77,7 @@ func (u *UCAdminClient) Update(id int, data *entity.UserUpdate) (*entity.User, e
 			return nil, fmt.Errorf("encode new password: %w", err)
 		}
 	}
-	if err := u.userRepoDB.Update(userObj); err != nil {
+	if err := u.userRepoDB.Update(context.Background(), userObj); err != nil {
 		return nil, fmt.Errorf("user: %w", err)
 	}
 	return userObj, nil
@@ -84,11 +85,11 @@ func (u *UCAdminClient) Update(id int, data *entity.UserUpdate) (*entity.User, e
 
 // DeleteByID deletes user object with given ID.
 func (u *UCAdminClient) DeleteByID(id int) error {
-	userObj, err := u.userRepoDB.GetByID(id)
+	userObj, err := u.userRepoDB.GetByID(context.Background(), id)
 	if err != nil {
 		return fmt.Errorf("get by id: %w", err)
 	}
-	if err := u.userRepoDB.Delete(userObj); err != nil {
+	if err := u.userRepoDB.Delete(context.Background(), userObj); err != nil {
 		return fmt.Errorf("delete by id: %w", err)
 	}
 	return nil
@@ -96,7 +97,7 @@ func (u *UCAdminClient) DeleteByID(id int) error {
 
 // GetAll returns all users.
 func (u *UCAdminClient) GetAll() ([]entity.User, error) {
-	userList, err := u.userRepoDB.GetAll()
+	userList, err := u.userRepoDB.GetAll(context.Background())
 	if err != nil {
 		return nil, fmt.Errorf("get all: %w", err)
 	}
