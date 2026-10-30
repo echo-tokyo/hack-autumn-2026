@@ -3,7 +3,7 @@ package server
 import (
 	"backend/config"
 	authhttpv1 "backend/internal/app/auth/controller/http/v1"
-	authrepo "backend/internal/app/auth/repository"
+	authrepo "backend/internal/app/auth/repo"
 	authuc "backend/internal/app/auth/usecase"
 	occurrencehttpv1 "backend/internal/app/payment_occurrence/controller/http/v1"
 	occurrencerepo "backend/internal/app/payment_occurrence/repository"
