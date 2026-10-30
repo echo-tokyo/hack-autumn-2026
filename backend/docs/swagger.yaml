@@ -24,15 +24,11 @@ definitions:
         type: string
       id:
         type: integer
-      isNotified:
-        type: boolean
       isOverdue:
         type: boolean
       isPaid:
         type: boolean
       name:
-        type: string
-      notifiedAt:
         type: string
       overdueDays:
         type: integer
@@ -234,7 +230,7 @@ paths:
         "401":
           description: неверный токен (пустой, истекший или неверный формат)
         "403":
-          description: токен в черном списке
+          description: запрещено (токен в черном списке)
       security:
       - JWTRefresh: []
       summary: Выход юзера.
@@ -244,7 +240,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: Получение всей информации о себе (юзер, профиль).
+      description: Получение всей информации о себе.
       operationId: auth-me-get
       produces:
       - application/json
@@ -539,7 +535,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: Создание нового юзера и профиля для него со всеми данными.
+      description: Создание нового юзера.
       operationId: users-create
       parameters:
       - description: userBody
@@ -622,8 +618,7 @@ paths:
     patch:
       consumes:
       - application/json
-      description: Полное обновление профиля юзера, его группы (если студент) и пароля
-        (опционально) по его id.
+      description: Частичное обновление юзера по его id.
       operationId: users-update
       parameters:
       - description: ID юзера

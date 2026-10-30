@@ -80,7 +80,7 @@ const docTemplate = `{
                         "description": "неверный токен (пустой, истекший или неверный формат)"
                     },
                     "403": {
-                        "description": "токен в черном списке"
+                        "description": "запрещено (токен в черном списке)"
                     }
                 }
             }
@@ -92,7 +92,7 @@ const docTemplate = `{
                         "JWTAccess": []
                     }
                 ],
-                "description": "Получение всей информации о себе (юзер, профиль).",
+                "description": "Получение всей информации о себе.",
                 "consumes": [
                     "application/json"
                 ],
@@ -540,7 +540,7 @@ const docTemplate = `{
                         "JWTAccess": []
                     }
                 ],
-                "description": "Создание нового юзера и профиля для него со всеми данными.",
+                "description": "Создание нового юзера.",
                 "consumes": [
                     "application/json"
                 ],
@@ -670,7 +670,7 @@ const docTemplate = `{
                         "JWTAccess": []
                     }
                 ],
-                "description": "Полное обновление профиля юзера, его группы (если студент) и пароля (опционально) по его id.",
+                "description": "Частичное обновление юзера по его id.",
                 "consumes": [
                     "application/json"
                 ],
@@ -752,9 +752,6 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
-                "isNotified": {
-                    "type": "boolean"
-                },
                 "isOverdue": {
                     "type": "boolean"
                 },
@@ -762,9 +759,6 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "name": {
-                    "type": "string"
-                },
-                "notifiedAt": {
                     "type": "string"
                 },
                 "overdueDays": {

@@ -2,7 +2,7 @@ db:
   host: "127.0.0.1" # db host
   port: 5432 # db port
   logging:
-    log_level: 2 # 2 - info, 3 - warn (default), 4 - error, 5 - silent
+    log_level: 3 # 2 - info, 3 - warn (default), 4 - error, 5 - silent
 
 app:
   logging:
@@ -30,3 +30,5 @@ app:
           secure: false # enable cookie secure if true
           http_only: true # enable cookie HTTP-only if true
           same_site: "Lax" # cookie same site mode ("None", "Strict" or "Lax")
+  occurrence:
+    gen_interval: 30s # the interval at which the occurrence generator checks the DB

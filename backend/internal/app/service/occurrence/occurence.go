@@ -19,8 +19,6 @@ import (
 
 const (
 	_maxConsecutiveFailures = 5
-	// _interval               = 24 * time.Hour
-	_interval = 30 * time.Second
 )
 
 // Occurrence ensures each active recurring payment has enough payment
@@ -46,7 +44,7 @@ func New(cfg *config.Config, dbStorage *db.DB) *Occurrence {
 		occRepo:  occRepo,
 		started:  make(chan struct{}),
 		exited:   make(chan struct{}),
-		interval: _interval,
+		interval: cfg.App.Occurrence.GenInterval,
 	}
 }
 

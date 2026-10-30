@@ -52,10 +52,14 @@ var (
 		CORS:            _defCORS,
 		Auth:            _defAuth,
 	}
+	_defOccurrence = Occurrence{
+		GenInterval: time.Hour,
+	}
 	_defApp = App{
 		TimezoneName: "UTC",
 		Logging:      _defLogging,
 		Server:       _defServer,
+		Occurrence:   _defOccurrence,
 	}
 	_defConfig = Config{
 		DB:  _defDB,
@@ -85,6 +89,7 @@ type (
 		Logging      `yaml:"logging"`
 		Server       `yaml:"server"`
 		Admin
+		Occurrence `yaml:"occurrence"`
 	}
 
 	Logging struct {
@@ -133,6 +138,10 @@ type (
 		Username    string `env-required:"true" env:"ADMIN_USERNAME"`
 		PasswordRaw []byte `env-required:"true" env:"ADMIN_PASSWORD" json:"-"`
 		Password    []byte `json:"-"`
+	}
+
+	Occurrence struct {
+		GenInterval time.Duration `yaml:"gen_interval"`
 	}
 )
 
