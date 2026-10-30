@@ -20,7 +20,7 @@ type userBody struct {
 
 func (u *userBody) Validate(valid validator.Validator) serialize.Validator {
 	return func(s any) error {
-		data, ok := s.(userBody)
+		data, ok := s.(*userBody)
 		if !ok {
 			return errors.New("invalid data type")
 		}
@@ -58,7 +58,7 @@ type updateBody struct {
 
 func (u *updateBody) Validate(valid validator.Validator) serialize.Validator {
 	return func(s any) error {
-		data, ok := s.(updateBody)
+		data, ok := s.(*updateBody)
 		if !ok {
 			return errors.New("invalid data type")
 		}
