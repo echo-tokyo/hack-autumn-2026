@@ -6,10 +6,10 @@ import (
 	authrepo "backend/internal/app/auth/repo"
 	authuc "backend/internal/app/auth/usecase"
 	occurrencehttpv1 "backend/internal/app/payment_occurrence/controller/http/v1"
-	occurrencerepo "backend/internal/app/payment_occurrence/repository"
+	occurrencerepo "backend/internal/app/payment_occurrence/repo"
 	occurrenceuc "backend/internal/app/payment_occurrence/usecase"
 	paymenthttpv1 "backend/internal/app/recurring_payment/controller/http/v1"
-	paymentrepo "backend/internal/app/recurring_payment/repository"
+	paymentrepo "backend/internal/app/recurring_payment/repo"
 	paymentuc "backend/internal/app/recurring_payment/usecase"
 	"backend/internal/app/service/server/middleware"
 	userhttpv1 "backend/internal/app/user/controller/http/v1"
@@ -17,6 +17,7 @@ import (
 	useruc "backend/internal/app/user/usecase"
 	"backend/internal/pkg/cache"
 	"backend/internal/pkg/db"
+	"backend/internal/pkg/db/transaction"
 	"backend/internal/pkg/validator"
 )
 
@@ -24,17 +25,18 @@ import (
 func (s *Server) registerEndpointsV1(cfg *config.Config, dbStorage *db.DB,
 	cacheStorage cache.Storage, valid validator.Validator) {
 
+	txManager := transaction.NewTxManager(dbStorage.DB)
 	// create repos
 	authRepoCache := authrepo.NewCache(cfg, cacheStorage)
 	userRepoDB := userrepo.NewDB(cfg, dbStorage)
-	rpRepo := paymentrepo.NewRepoDB(dbStorage)
+	rpRepo := paymentrepo.NewDB(dbStorage)
 	occRepo := occurrencerepo.NewRepoDB(dbStorage)
 
 	// create usecases
 	authUCClient := authuc.NewUCClient(cfg, userRepoDB, authRepoCache)
 	authUCMiddleware := authuc.NewUCMiddleware(cfg, authRepoCache)
 	userUCAdminClient := useruc.NewUCAdminClient(cfg, userRepoDB)
-	rpUC := paymentuc.NewUCAdminClient(cfg, rpRepo, occRepo)
+	rpUC := paymentuc.NewUCAdminClient(cfg, txManager, rpRepo, occRepo)
 	occUC := occurrenceuc.NewUC(cfg, occRepo)
 
 	// create controllers

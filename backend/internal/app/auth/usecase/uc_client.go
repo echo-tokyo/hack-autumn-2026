@@ -2,6 +2,7 @@
 package usecase
 
 import (
+	"context"
 	"fmt"
 
 	"backend/config"
@@ -55,7 +56,7 @@ func (u *UCClient) LogIn(username string, passwd []byte) (*entity.UserWithToken,
 	} else {
 		var err error
 		// get userObj from DB with username
-		userObj, err = u.userRepoDB.GetByUsername(username)
+		userObj, err = u.userRepoDB.GetByUsername(context.Background(), username)
 		if err != nil {
 			return nil, fmt.Errorf("get user by username: %w", err)
 		}

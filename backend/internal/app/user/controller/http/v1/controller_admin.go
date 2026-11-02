@@ -109,7 +109,7 @@ func (c *UserControllerAdmin) Update(ctx *fiber.Ctx) error {
 		return err
 	}
 	inputBody := &updateBody{}
-	err := serialize.Deserialize(inputBody, ctx.BodyParser, inputBody.Validate(c.valid))
+	err := serialize.Deserialize(inputBody, ctx.BodyParser, inputBody.Validator(c.valid))
 	if err != nil {
 		return err
 	}

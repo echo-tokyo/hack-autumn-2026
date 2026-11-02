@@ -56,7 +56,7 @@ type updateBody struct {
 	Password string `json:"password,omitempty" validate:"omitempty,strong-passwd,min=8,max=40" example:"Qwerty123!" minLength:"8" maxLength:"40"`
 }
 
-func (u *updateBody) Validate(valid validator.Validator) serialize.Validator {
+func (u *updateBody) Validator(valid validator.Validator) serialize.Validator {
 	return func(s any) error {
 		data, ok := s.(*updateBody)
 		if !ok {

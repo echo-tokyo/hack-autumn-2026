@@ -69,12 +69,8 @@ linters:
       - legacy
       - std-error-handling
     paths:
-      - temp
-      - frontend
-      - web-server
-      - backend/internal/app/payment_occurrence
-      - backend/internal/app/recurring_payment
-      - backend/internal/app/service/occurrence
+      - internal/app/payment_occurrence
+      - internal/app/service/occurrence
     rules:
       - linters: # general accepted var name for type assertions
           - varnamelen

@@ -32,3 +32,14 @@ func ComputeNextDeadline(deadlineDay int, from time.Time) time.Time {
 
 	return time.Date(nextYear, nextMonth, actualDay, 0, 0, 0, 0, time.UTC)
 }
+
+// DateOnly returns date-only time in UTC.
+func DateOnly(t time.Time) time.Time {
+	return time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, time.UTC)
+}
+
+// today returns current date (date only) in configured timezone normalized to UTC.
+func Today(locale *time.Location) time.Time {
+	now := time.Now().In(locale)
+	return DateOnly(now)
+}

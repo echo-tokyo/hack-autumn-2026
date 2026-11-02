@@ -3,6 +3,6 @@ package recurringpayment
 import "errors"
 
 var (
-	ErrNotFound        = errors.New("record not found")
-	ErrInvalidArgument = errors.New("invalid argument")
+	ErrDateTooFar = errors.New("date too far in the past") // code 400
+	ErrNotFound   = errors.New("record not found")         // code 404
 )
