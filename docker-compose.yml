@@ -7,8 +7,8 @@ services:
     env_file:
       - ./.env
     restart: always
-    ports:
-      - "127.0.0.1:5432:5432"
+    expose:
+      - "5432"
     networks:
       main_network:
     volumes:
@@ -22,7 +22,7 @@ services:
     container_name: keeper_server
     restart: always
     expose:
-      - "8080"
+      - "8000"
     env_file:
      - ./.env
     volumes:
@@ -42,7 +42,7 @@ services:
     container_name: keeper_webserver
     restart: always
     ports:
-      - "80:80"
+      - "127.0.0.1:8804:80"
     networks:
       main_network:
     depends_on:
