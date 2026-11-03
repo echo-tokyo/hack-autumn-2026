@@ -40,12 +40,12 @@ func (u *updateOccurrenceBody) Validator(valid validator.Validator,
 			return err
 		}
 		// parse payment date
-		var err error
 		if data.PaymentDateRaw != nil {
-			*data.PaymentDate, err = time.Parse(_dateFmt, *data.PaymentDateRaw)
+			paymentDate, err := time.Parse(_dateFmt, *data.PaymentDateRaw)
 			if err != nil {
 				return fmt.Errorf("%w: invalid startDate: %s", validator.ErrValidate, err.Error())
 			}
+			data.PaymentDate = &paymentDate
 
 			today := utilstime.Today(timezone)
 			if utilstime.FormatDate(*data.PaymentDate) > utilstime.FormatDate(today) {
