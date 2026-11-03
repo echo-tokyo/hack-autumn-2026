@@ -87,6 +87,7 @@ func (s *Occurrence) Run(ctx context.Context, errChan chan<- error) {
 	}
 }
 
+// runOnceWithFailure execs runOnce and processes failures if it occurs.
 func (s *Occurrence) runOnceWithFailure(ctx context.Context,
 	errChan chan<- error, fails *int) bool {
 
