@@ -30,7 +30,7 @@ func (s *Server) registerEndpointsV1(cfg *config.Config, dbStorage *db.DB,
 	authRepoCache := authrepo.NewCache(cfg, cacheStorage)
 	userRepoDB := userrepo.NewDB(cfg, dbStorage)
 	rpRepo := paymentrepo.NewDB(dbStorage)
-	occRepo := occurrencerepo.NewRepoDB(dbStorage)
+	occRepo := occurrencerepo.NewDB(dbStorage)
 
 	// create usecases
 	authUCClient := authuc.NewUCClient(cfg, userRepoDB, authRepoCache)
@@ -45,7 +45,7 @@ func (s *Server) registerEndpointsV1(cfg *config.Config, dbStorage *db.DB,
 	userController := userhttpv1.NewController(userUCAdminClient, valid)
 	rpCtrl := paymenthttpv1.NewController(rpUC, valid)
 	rpCtrlAdmin := paymenthttpv1.NewControllerAdmin(rpUC, valid)
-	occCtrl := occurrencehttpv1.NewController(occUC, valid)
+	occCtrl := occurrencehttpv1.NewController(cfg, occUC, valid)
 
 	// middlewares
 	mwJWTRefresh := middleware.JWTRefresh(cfg, authUCMiddleware)

@@ -42,8 +42,7 @@ func NewUCAdminClient(cfg *config.Config, txManager *transaction.TxManager,
 // Create creates a new recurring payment, actual occurrence and backfill occurrences.
 func (u *UCAdminClient) Create(payment *entity.RecurringPayment) error {
 	return u.txManager.WithTransaction(func(ctx context.Context) error {
-		// TODO: context with tx
-		if err := u.repo.Create(context.Background(), payment); err != nil {
+		if err := u.repo.Create(ctx, payment); err != nil {
 			return fmt.Errorf("create recurring payment: %w", err)
 		}
 		if err := u.createInitialOccurrences(ctx, payment); err != nil {
@@ -80,8 +79,7 @@ func (u *UCAdminClient) createInitialOccurrences(ctx context.Context,
 			Currency:           payment.Currency,
 			DueDate:            due,
 		}
-		// err := u.occRepo.Create(ctx, occ) TODO: context with tx
-		err := u.occRepo.Create(occ)
+		err := u.occRepo.Create(ctx, occ)
 		if err != nil {
 			return fmt.Errorf("create occurrence due %s: %w", occ.DueDateFmt(), err)
 		}

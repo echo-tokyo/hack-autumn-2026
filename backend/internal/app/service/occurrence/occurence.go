@@ -10,9 +10,9 @@ import (
 	"backend/config"
 	"backend/internal/app/entity"
 	occurrence "backend/internal/app/payment_occurrence"
-	occurrencerepo "backend/internal/app/payment_occurrence/repository"
-	payment "backend/internal/app/recurring_payment"
-	paymentrepo "backend/internal/app/recurring_payment/repository"
+	occurrencerepo "backend/internal/app/payment_occurrence/repo"
+	recurringpayment "backend/internal/app/recurring_payment"
+	paymentrepo "backend/internal/app/recurring_payment/repo"
 	"backend/internal/pkg/db"
 	utilstime "backend/internal/pkg/utils/time"
 )
@@ -25,7 +25,7 @@ const (
 // occurrences generated ahead of time.
 type Occurrence struct {
 	cfg      *config.Config
-	rpRepo   payment.RepositoryDB
+	rpRepo   recurringpayment.RepositoryDB
 	occRepo  occurrence.RepositoryDB
 	interval time.Duration
 
@@ -35,8 +35,8 @@ type Occurrence struct {
 
 // New returns a new instance of [Occurrence].
 func New(cfg *config.Config, dbStorage *db.DB) *Occurrence {
-	rpRepo := paymentrepo.NewRepoDB(dbStorage)
-	occRepo := occurrencerepo.NewRepoDB(dbStorage)
+	rpRepo := paymentrepo.NewDB(dbStorage)
+	occRepo := occurrencerepo.NewDB(dbStorage)
 
 	return &Occurrence{
 		cfg:      cfg,
@@ -67,33 +67,8 @@ func (s *Occurrence) Run(ctx context.Context, errChan chan<- error) {
 	defer close(s.exited)
 
 	failures := 0
-
-	// runOnce with failure accounting.
-	run := func() (continueRunning bool) {
-		if err := s.runOnce(ctx); err != nil {
-			if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
-				return false
-			}
-			failures++
-			slog.Error("occurrence generator: run failed",
-				"err", err,
-				"consecutive_failures", failures,
-			)
-			if failures >= _maxConsecutiveFailures {
-				select {
-				case errChan <- fmt.Errorf("occurrence generator: %d consecutive failures: %w", failures, err):
-				default:
-				}
-				return false
-			}
-			return true
-		}
-		failures = 0
-		return true
-	}
-
-	// Immediate run on startup, then periodic.
-	if !run() {
+	// Immediate run on startup, then periodic
+	if !s.runOnceWithFailure(ctx, errChan, &failures) {
 		return
 	}
 
@@ -105,105 +80,87 @@ func (s *Occurrence) Run(ctx context.Context, errChan chan<- error) {
 		case <-ctx.Done():
 			return
 		case <-ticker.C:
-			if !run() {
+			if !s.runOnceWithFailure(ctx, errChan, &failures) {
 				return
 			}
 		}
 	}
 }
 
-// runOnce scans all active recurring payments and creates missing
-// occurrences up to now + lookahead.
-func (s *Occurrence) runOnce(ctx context.Context) error {
-	if err := ctx.Err(); err != nil {
-		return err
-	}
+func (s *Occurrence) runOnceWithFailure(ctx context.Context,
+	errChan chan<- error, fails *int) bool {
 
-	payments, err := s.rpRepo.List()
+	if err := s.runOnce(ctx); err != nil {
+		if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
+			return false
+		}
+		*fails++
+		slog.Error("occurrence generator: run failed",
+			"err", err,
+			"consecutive_failures", *fails,
+		)
+		if *fails >= _maxConsecutiveFailures {
+			select {
+			case errChan <- fmt.Errorf("occurrence generator: %d fails: %w", *fails, err):
+			default:
+			}
+			return false
+		}
+		return true
+	}
+	*fails = 0
+	return true
+}
+
+// runOnce scans all active recurring payments and creates missing occurrences.
+func (s *Occurrence) runOnce(ctx context.Context) error {
+	today := utilstime.Today(time.UTC)
+
+	payments, err := s.rpRepo.List(context.Background())
 	if err != nil {
 		return fmt.Errorf("list recurring payments: %w", err)
 	}
 
-	now := time.Now().UTC()
-	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.UTC)
-
-	for _, rp := range payments {
+	for _, payment := range payments {
 		if err := ctx.Err(); err != nil {
 			return err
 		}
-		if err := s.ensureFor(ctx, rp, today); err != nil {
+		if err := s.ensureFor(payment, today); err != nil {
 			slog.Error("occurrence generator: ensure for payment failed",
-				"recurring_payment_id", rp.ID,
+				"recurring_payment_id", payment.ID,
 				"err", err,
 			)
 		}
 	}
-
 	return nil
 }
 
-// ensureFor creates the next occurrence for rp if its previous occurrence
-// is due today or overdue.
-func (s *Occurrence) ensureFor(
-	ctx context.Context,
-	rp *entity.RecurringPayment,
-	today time.Time,
-) error {
-	latest, err := s.occRepo.GetLatestByRecurringPayment(rp.ID)
-	if errors.Is(err, occurrence.ErrNotFound) {
-		// Defensive: normally the first occurrence is created inside
-		// RecurringPayment.Create. If it is missing (manual seeding,
-		// partial failure) — create one on start_date and exit.
-		first := &entity.PaymentOccurrence{
-			RecurringPaymentID: rp.ID,
-			Amount:             rp.Amount,
-			Currency:           rp.Currency,
-			DueDate:            truncateToDateUTC(rp.StartDate),
-		}
-		if err := s.occRepo.Create(first); err != nil &&
-			!errors.Is(err, occurrence.ErrAlreadyExists) {
-			return fmt.Errorf("create first occurrence: %w", err)
-		}
-		return nil
-	}
+// ensureFor creates the next occurrence for recurring payment if
+// its previous occurrence is due today or overdue.
+func (s *Occurrence) ensureFor(payment *entity.RecurringPayment, today time.Time) error {
+	latest, err := s.occRepo.GetLatestByPayment(context.Background(), payment.ID)
 	if err != nil {
 		return fmt.Errorf("get latest occurrence: %w", err)
 	}
 
-	latestDue := truncateToDateUTC(latest.DueDate)
-
-	// Period still current or future → nothing to do.
-	// Strict "<": on the due date itself we do NOT create the next period.
-	// It will be created the next day. This guarantees at least one day
-	// of "settling" for the paid/unpaid state to be processed.
+	latestDue := utilstime.DateOnly(latest.DueDate)
 	if !latestDue.Before(today) {
 		return nil
 	}
-
-	nextDue := utilstime.ComputeNextDeadline(int(rp.BillingDay), latestDue)
+	nextDue := utilstime.ComputeNextDeadline(int(payment.BillingDay), latestDue)
 
 	occ := &entity.PaymentOccurrence{
-		RecurringPaymentID: rp.ID,
-		Amount:             rp.Amount,
-		Currency:           rp.Currency,
+		RecurringPaymentID: payment.ID,
+		Amount:             payment.Amount,
+		Currency:           payment.Currency,
 		DueDate:            nextDue,
 	}
-
-	if err := s.occRepo.Create(occ); err != nil {
-		if errors.Is(err, occurrence.ErrAlreadyExists) {
-			return nil // already created in a previous run
-		}
-		return fmt.Errorf(
-			"create occurrence due %s: %w",
-			nextDue.Format("2006-01-02"), err,
-		)
+	err = s.occRepo.Create(context.Background(), occ)
+	if errors.Is(err, occurrence.ErrAlreadyExists) {
+		return nil // already created in a previous run
 	}
-
+	if err != nil {
+		return fmt.Errorf("create occurrence due %s: %w", utilstime.FormatDate(nextDue), err)
+	}
 	return nil
-}
-
-// truncateToDateUTC returns date-only time in UTC.
-// due_date is a DATE column: we want the calendar day, not a moment in time.
-func truncateToDateUTC(t time.Time) time.Time {
-	return time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, time.UTC)
 }

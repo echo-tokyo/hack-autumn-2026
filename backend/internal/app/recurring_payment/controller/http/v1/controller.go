@@ -37,7 +37,6 @@ func NewController(uc recurringpayment.UsecaseClient,
 // @security		JWTAccess
 // @success		200	{array}	entity.RecurringPayment
 // @failure		401	"неверный токен (пустой, истекший или неверный формат)"
-// @failure		500	"внутренняя ошибка"
 func (c *RecurringPaymentController) List(ctx *fiber.Ctx) error {
 	payments, err := c.uc.List()
 	if err != nil {

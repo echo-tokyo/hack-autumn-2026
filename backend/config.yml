@@ -1,5 +1,5 @@
 db:
-  host: "127.0.0.1" # db host
+  host: "127.0.0.1" # psql # db host
   port: 5432 # db port
   logging:
     log_level: 3 # 2 - info, 3 - warn (default), 4 - error, 5 - silent
@@ -20,14 +20,14 @@ app:
         ttl: 30m # access JWT-token expiration duration
         cookie:
           path: "/" # cookie path
-          secure: false # enable cookie secure if true
+          secure: true # enable cookie secure if true
           http_only: true # enable cookie HTTP-only if true
           same_site: "Lax" # cookie same site mode ("None", "Strict" or "Lax")
       refresh_token:
         ttl: 24h # refresh JWT-token expiration duration
         cookie:
           path: "/api/v1/auth/" # cookie path
-          secure: false # enable cookie secure if true
+          secure: true # enable cookie secure if true
           http_only: true # enable cookie HTTP-only if true
           same_site: "Lax" # cookie same site mode ("None", "Strict" or "Lax")
   occurrence:

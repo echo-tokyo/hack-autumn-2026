@@ -1,12 +1,14 @@
 package usecase
 
 import (
+	"context"
 	"fmt"
 	"time"
 
 	"backend/config"
 	"backend/internal/app/entity"
 	occurrence "backend/internal/app/payment_occurrence"
+	utilstime "backend/internal/pkg/utils/time"
 )
 
 // Ensure UC implements interface.
@@ -27,14 +29,44 @@ func NewUC(cfg *config.Config, repo occurrence.RepositoryDB) *UC {
 	}
 }
 
-// List returns occurrences matching filter.
-// IsOverdue is computed for each.
-func (u *UC) List(filter occurrence.ListFilter) ([]*entity.PaymentOccurrence, error) {
-	today := u.today()
-	// Inject today into filter so repository can compute paid/unpaid/overdue.
-	filter.Today = today
+// GetByID returns occurrence by given id.
+func (u *UC) GetByID(id int32) (*entity.PaymentOccurrence, error) {
+	occ, err := u.repo.GetByID(context.Background(), id)
+	if err != nil {
+		return nil, fmt.Errorf("get by id: %w", err)
+	}
 
-	occurrences, err := u.repo.List(filter)
+	today := utilstime.Today(u.cfg.Timezone)
+	occ.IsOverdue, occ.OverdueDays = computeOverdue(occ, today)
+	return occ, nil
+}
+
+// Update applies payment status changes. Returns updated occurrence.
+func (u *UC) Update(id int32, updates *entity.OccUpdate) (*entity.PaymentOccurrence, error) {
+	occ, err := u.repo.GetByID(context.Background(), id)
+	if err != nil {
+		return nil, fmt.Errorf("get by id: %w", err)
+	}
+
+	today := utilstime.Today(u.cfg.Timezone)
+	if err := u.updateCases(today, updates, occ); err != nil {
+		return nil, err
+	}
+
+	if err := u.repo.Update(context.Background(), occ); err != nil {
+		return nil, fmt.Errorf("update: %w", err)
+	}
+	occ.IsOverdue, occ.OverdueDays = computeOverdue(occ, today)
+	return occ, nil
+}
+
+// List returns occurrences matching filter.
+func (u *UC) List(filter *entity.OccListFilter) ([]*entity.PaymentOccurrence, error) {
+	today := utilstime.Today(u.cfg.Timezone)
+	// inject today into filter so repository can compute paid/unpaid/overdue.
+	filter.Today = utilstime.FormatDate(today)
+
+	occurrences, err := u.repo.List(context.Background(), filter)
 	if err != nil {
 		return nil, fmt.Errorf("list: %w", err)
 	}
@@ -42,173 +74,69 @@ func (u *UC) List(filter occurrence.ListFilter) ([]*entity.PaymentOccurrence, er
 	for _, occ := range occurrences {
 		occ.IsOverdue, occ.OverdueDays = computeOverdue(occ, today)
 	}
-
 	return occurrences, nil
 }
 
-// GetByID returns occurrence by given id.
-func (u *UC) GetByID(id int32) (*entity.PaymentOccurrence, error) {
-	if id <= 0 {
-		return nil, fmt.Errorf("%w: id must be positive", occurrence.ErrInvalidArgument)
-	}
-
-	occ, err := u.repo.GetByID(id)
+// Summary returns total amounts grouped by currency.
+func (u *UC) Summary() ([]entity.OccSummary, error) {
+	todayDate := utilstime.FormatDate(utilstime.Today(u.cfg.Timezone))
+	result, err := u.repo.Summary(context.Background(), todayDate)
 	if err != nil {
-		return nil, fmt.Errorf("get by id: %w", err)
+		return nil, fmt.Errorf("summary: %w", err)
 	}
-
-	today := u.today()
-	occ.IsOverdue, occ.OverdueDays = computeOverdue(occ, today)
-	return occ, nil
+	return result, nil
 }
 
-// Update applies payment status changes.
-func (u *UC) Update(id int32, input occurrence.UpdateInput) (*entity.PaymentOccurrence, error) {
-	if id <= 0 {
-		return nil, fmt.Errorf("%w: id must be positive", occurrence.ErrInvalidArgument)
-	}
-	if input.IsPaid == nil && input.PaymentDate == nil {
-		return nil, fmt.Errorf("%w: nothing to update", occurrence.ErrInvalidArgument)
-	}
+func (u *UC) updateCases(today time.Time, updates *entity.OccUpdate,
+	occ *entity.PaymentOccurrence) error {
 
-	occ, err := u.repo.GetByID(id)
-	if err != nil {
-		return nil, fmt.Errorf("get by id: %w", err)
-	}
-
-	today := u.today()
 	switch {
-	case input.IsPaid != nil && !*input.IsPaid:
-		// Unmark: clear payment date (per ТЗ).
+	case updates.IsPaid != nil && !*updates.IsPaid:
 		occ.IsPaid = false
 		occ.PaymentDate = nil
 
-	case input.IsPaid != nil && *input.IsPaid:
-		// Mark as paid: use provided date or today.
+	case updates.IsPaid != nil && *updates.IsPaid:
 		payDate := today
-		if input.PaymentDate != nil {
-			payDate = truncateToDate(*input.PaymentDate)
-		}
-		if isFutureDate(payDate, today) {
-			return nil, fmt.Errorf("%w: payment_date cannot be in the future", occurrence.ErrInvalidArgument)
+		if updates.PaymentDate != nil {
+			payDate = utilstime.DateOnly(*updates.PaymentDate)
 		}
 		occ.IsPaid = true
 		occ.PaymentDate = &payDate
 
-	case input.IsPaid == nil && input.PaymentDate != nil:
-		// Fixing date only — occurrence must already be paid.
+	case updates.IsPaid == nil && updates.PaymentDate != nil:
 		if !occ.IsPaid {
-			return nil, fmt.Errorf(
-				"%w: cannot set payment_date for unpaid occurrence",
-				occurrence.ErrInvalidArgument,
-			)
+			return fmt.Errorf("%w: cannot set payment_date for unpaid occurrence",
+				occurrence.ErrInvalidData)
 		}
-		payDate := truncateToDate(*input.PaymentDate)
-		if isFutureDate(payDate, today) {
-			return nil, fmt.Errorf("%w: payment_date cannot be in the future", occurrence.ErrInvalidArgument)
-		}
+		payDate := utilstime.DateOnly(*updates.PaymentDate)
 		occ.PaymentDate = &payDate
 	}
-
-	if err := u.repo.Update(occ); err != nil {
-		return nil, fmt.Errorf("update: %w", err)
-	}
-
-	occ.IsOverdue, occ.OverdueDays = computeOverdue(occ, today)
-	return occ, nil
-}
-
-func (u *UC) Summary() ([]occurrence.CurrencySummary, error) {
-	raw, err := u.repo.Summary(u.today())
-	if err != nil {
-		return nil, fmt.Errorf("summary: %w", err)
-	}
-
-	// Always return all three currencies, even if there are no rows for
-	// some of them. The frontend can render a stable 3-row table without
-	// null-checks. Zero-value decimal.Decimal equals 0.
-	result := []occurrence.CurrencySummary{
-		{Currency: entity.CurrencyRUB},
-		{Currency: entity.CurrencyUSD},
-		{Currency: entity.CurrencyEUR},
-	}
-	for i, cs := range result {
-		if got, ok := raw[cs.Currency]; ok {
-			result[i] = got
-		}
-	}
-
-	return result, nil
-}
-
-// isFutureDate reports whether d is strictly after ref (calendar days).
-// Both are compared as YYYY-MM-DD strings, ignoring time and timezone.
-func isFutureDate(d, ref time.Time) bool {
-	return d.Format("2006-01-02") > ref.Format("2006-01-02")
-}
-
-// today returns current date (00:00:00) in UTC.
-func (u *UC) today() time.Time {
-	now := time.Now().In(u.cfg.Timezone)
-	return time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.UTC)
+	return nil
 }
 
 // computeOverdue returns whether the occurrence is currently overdue
 // and the number of days it has been (or was) overdue.
-func computeOverdue(occ *entity.PaymentOccurrence, today time.Time) (bool, int32) {
-	due := dateOnly(occ.DueDate)
+func computeOverdue(occ *entity.PaymentOccurrence,
+	today time.Time) (isOverdue bool, overdueDays int32) {
+
+	due := utilstime.DateOnly(occ.DueDate)
 
 	if occ.IsPaid {
+		// treat as paid on due date.
 		if occ.PaymentDate == nil {
-			// Defensive: inconsistent state, treat as paid on due date.
 			return false, 0
 		}
-		paid := dateOnly(*occ.PaymentDate)
+		paid := utilstime.DateOnly(*occ.PaymentDate)
+		// paid on time or early
 		if !paid.After(due) {
-			// paid on time or early
 			return false, 0
 		}
-		days := int32(paid.Sub(due).Hours() / 24)
-		return false, days
+		return false, utilstime.DaysBetween(paid, due)
 	}
 
-	todayDate := dateOnly(today)
-	if !todayDate.After(due) {
-		// not yet due, or exactly on due date
+	// not yet due, or exactly on due date
+	if !today.After(due) {
 		return false, 0
 	}
-	days := int32(todayDate.Sub(due).Hours() / 24)
-	return true, days
-}
-
-// dateOnly truncates t to midnight UTC keeping the same calendar day.
-func dateOnly(t time.Time) time.Time {
-	return time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, time.UTC)
-}
-
-// truncateToDate returns time at 00:00:00 UTC of the same calendar day.
-func truncateToDate(t time.Time) time.Time {
-	return time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, time.UTC)
-}
-
-// ComputeNextDueDate returns the next due date after 'from' for a payment
-// that bills on 'billingDay' each month.
-func ComputeNextDueDate(billingDay int, from time.Time) time.Time {
-	year, month, _ := from.Date()
-	nextMonth := month + 1
-	nextYear := year
-	if nextMonth > 12 {
-		nextMonth = 1
-		nextYear++
-	}
-
-	// Last day of target month: time.Date(year, month+1, 0, ...)
-	// returns last day of 'month' because day=0 means "day before the 1st".
-	lastDay := time.Date(nextYear, nextMonth+1, 0, 0, 0, 0, 0, time.UTC).Day()
-	actualDay := billingDay
-	if actualDay > lastDay {
-		actualDay = lastDay
-	}
-
-	return time.Date(nextYear, nextMonth, actualDay, 0, 0, 0, 0, time.UTC)
+	return true, utilstime.DaysBetween(today, due)
 }

@@ -3,7 +3,7 @@ package paymentoccurrence
 import "errors"
 
 var (
-	ErrNotFound        = errors.New("record not found")
-	ErrAlreadyExists   = errors.New("record already exists")
-	ErrInvalidArgument = errors.New("invalid argument")
+	ErrInvalidData   = errors.New("invalid data")          // code 400
+	ErrNotFound      = errors.New("record not found")      // code 404
+	ErrAlreadyExists = errors.New("record already exists") // code 409
 )

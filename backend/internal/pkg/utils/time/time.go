@@ -1,10 +1,16 @@
 package time
 
-import "time"
+import (
+	"math"
+	"time"
+)
 
 const (
+	_hoursInDay   = 24
 	_daysInMonth  = 31
 	_monthsInYear = 12
+
+	_dateFmt = "2006-01-02"
 )
 
 // ComputeNextDeadline returns the next deadline date after 'from'
@@ -39,7 +45,17 @@ func DateOnly(t time.Time) time.Time {
 }
 
 // today returns current date (date only) in configured timezone normalized to UTC.
-func Today(locale *time.Location) time.Time {
-	now := time.Now().In(locale)
+func Today(timezone *time.Location) time.Time {
+	now := time.Now().In(timezone)
 	return DateOnly(now)
+}
+
+// FormatDate formats time.Time to date string.
+func FormatDate(t time.Time) string {
+	return t.Format(_dateFmt)
+}
+
+// DaysBetween returns days amount between given dates.
+func DaysBetween(t1, t2 time.Time) int32 {
+	return int32(math.Abs(t1.Sub(t2).Hours()) / _hoursInDay)
 }

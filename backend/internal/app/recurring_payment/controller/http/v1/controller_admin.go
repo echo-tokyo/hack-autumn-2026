@@ -40,7 +40,6 @@ func NewControllerAdmin(uc recurringpayment.UsecaseAdmin,
 // @success		201		{object}	entity.RecurringPayment
 // @failure		401		"неверный токен (пустой, истекший или неверный формат)"
 // @failure		403		"требуется роль администратора"
-// @failure		500		"внутренняя ошибка"
 func (c *RecurringPaymentControllerAdmin) Create(ctx *fiber.Ctx) error {
 	body := &recurringPaymentBody{}
 	if err := serialize.Deserialize(body, body.Parser(ctx), c.valid.Validate); err != nil {
@@ -73,7 +72,6 @@ func (c *RecurringPaymentControllerAdmin) Create(ctx *fiber.Ctx) error {
 // @failure		401	"неверный токен (пустой, истекший или неверный формат)"
 // @failure		403	"требуется роль администратора"
 // @failure		404	"регулярный платёж не найден"
-// @failure		500	"внутренняя ошибка"
 func (c *RecurringPaymentControllerAdmin) Delete(ctx *fiber.Ctx) error {
 	inputPath := &idPath{}
 	if err := serialize.Deserialize(inputPath, ctx.ParamsParser, c.valid.Validate); err != nil {
